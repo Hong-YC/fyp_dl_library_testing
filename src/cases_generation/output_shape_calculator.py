@@ -16,3 +16,4 @@ class OutputShapeCalculator(object):
 
         return (*input_shape[:-dim_num - 1], out_channels, *new_shape)
 
+
