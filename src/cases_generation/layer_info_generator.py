@@ -18,7 +18,7 @@ class LayerInfoGenerator(object):
         Generate a random layer name, parameter dict, and output shape
         :param input_shape:
         :param last_layer:
-        :param pool:
+        :param pool: A set of layer types to choose from
         :return:
         """
         input_dim = len(input_shape)
@@ -29,9 +29,13 @@ class LayerInfoGenerator(object):
         #                                          input_dim=input_dim)
         # if element is None:  # No suitable layer type
         #     return None, None, input_shape
-        element = 'Conv2d'
+        element = 'Linear'
+
+        if element is None:  # No suitable layer type
+            return None, None, input_shape
 
         return self.__layer_funcs[element](input_shape=input_shape)
+
 
 class LayerInfo(object):
 
@@ -39,6 +43,30 @@ class LayerInfo(object):
         super().__init__()
         self.__output_shape = OutputShapeCalculator()
         self.__random = variable_generator
+
+    def Linear_layer(self, input_shape: Tuple[Optional[int]], out_features: Optional[int] = None):
+        if out_features is None:
+            out_features = self.__random.ele_size()
+        args = dict(
+            in_features=input_shape[-1],
+            out_features=out_features,
+            bias=self.__random.boolean(),
+
+        )
+        return 'Linear', args, self.__output_shape.linear_layer(input_shape, **args)
+
+    def Flatten_layer(self, input_shape: Tuple[Optional[int]], start_dim: Optional[int]=None, end_dim: Optional[int]=None):
+        """
+        Flatten the input tensor within the start and end dimension
+        :param input_shape:
+        :param start_dim:
+        :param end_dim:
+        :return:
+        """
+        args = dict(
+
+        )
+        return 'flatten', args, self.__output_shape.flatten_layer(input_shape=input_shape)
 
     def Conv2d_layer(self, input_shape: Tuple[Optional[int]]):
         """
@@ -65,7 +93,7 @@ class LayerInfo(object):
 
 
 if __name__ == '__main__':
-    var_gen = VariableGenerator({'tensor_element_size_range': [10, 100]})
+    var_gen = VariableGenerator({'tensor_element_size_range': [10, 100], 'tensor_dimension_range': [2, 5]})
     lay_info_gen = LayerInfoGenerator(var_gen)
     info = lay_info_gen.generate((32, 3, 1024, 1024))
     print(info[1], info[2])

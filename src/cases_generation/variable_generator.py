@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, List
+from typing import Tuple, List, Optional, Any
 import math
 
 
@@ -7,7 +7,36 @@ class VariableGenerator(object):
 
     def __init__(self, config: dict):
         super().__init__()
+        self.__tensor_dim_range = config['tensor_dimension_range']
         self.__tensor_ele_size_range = config['tensor_element_size_range']
+
+    def input_object(self, shape: Optional[Tuple[Optional[int]]] = None):
+        '''返回一个随机生成的input张量的名字, 参数字典和形状, 形状也可以指定
+        '''
+        if shape is None:
+            shape = self.shape()
+        args = dict(
+            shape=shape[1:],
+            batch_shape=None,
+            dtype=None,
+            sparse=False,  # True when input is a sparse matrix
+            tensor=None,
+        )
+        return 'input_object', args, shape
+
+    def shape(self, dim: Optional[int] = None) -> tuple[None, Any]:
+        """
+        Return a randomly generated shape element,
+        for example if dim = 4, return (None, 3, 32, 32)
+        :param dim:
+        :return:
+        """
+        if dim is None:
+            dim = random.randint(*self.__tensor_dim_range)
+        return (
+            None,
+            *tuple(random.choices(range(self.__tensor_ele_size_range[0], self.__tensor_ele_size_range[1]+1), k=dim-1))
+        )
 
     def kernel_size(self, window_max_shape: Tuple[int]) -> List[int]:
         length = random.randint(1, min(window_max_shape))

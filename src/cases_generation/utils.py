@@ -6,8 +6,9 @@ def get_layer_func(layer_type):
 
 
 seq_layer_types = [
-
+    'Linear',
     'Conv2d',
+
 
 ]
 
