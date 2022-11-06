@@ -10,11 +10,15 @@ class OutputShapeCalculator(object):
     def linear_layer(self, input_shape, out_features, **kwargs):
         return (*input_shape[:-1], out_features)
 
-    # def reshape_layer(self, target_shape, **kwargs):
-    #     return (None, *target_shape)
+    def reshape_layer(self, target_shape, **kwargs):
+        return (None, *target_shape)
 
-    # def flatten_layer(self, input_shape):
-    #     return (None, reduce(lambda x, y: x*y, input_shape[1:])) if len(input_shape) >= 2 else (input_shape[0], 1)
+    def flatten_layer(self, input_shape, **kwargs):
+        """
+        We flatten all dimension except batch size, if input_shape is (batch,) we output (batch, 1)
+        Hong: here input_shape[0] should be None
+        """
+        return (input_shape[0], reduce(lambda x, y: x*y, input_shape[1:])) if len(input_shape) >= 2 else (input_shape[0], 1)
 
 
     def conv_layer(self, input_shape, dim_num, kernel_size, padding, strides, out_channels, **kwargs):

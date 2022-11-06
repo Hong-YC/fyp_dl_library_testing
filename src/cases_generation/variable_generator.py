@@ -11,32 +11,39 @@ class VariableGenerator(object):
         self.__tensor_ele_size_range = config['tensor_element_size_range']
 
     def input_object(self, shape: Optional[Tuple[Optional[int]]] = None):
-        '''返回一个随机生成的input张量的名字, 参数字典和形状, 形状也可以指定
-        '''
+        """
+        Generate a input object
+        :param shape: The shape of the generated object (If None, generate randomly)
+        """
+
         if shape is None:
             shape = self.shape()
         args = dict(
             shape=shape[1:],
-            batch_shape=None,
-            dtype=None,
-            sparse=False,  # True when input is a sparse matrix
-            tensor=None,
+            batch_shape=None
         )
         return 'input_object', args, shape
 
     def shape(self, dim: Optional[int] = None) -> tuple[None, Any]:
         """
         Return a randomly generated shape element,
-        for example if dim = 4, return (None, 3, 32, 32)
-        :param dim:
-        :return:
+        for example if dim = 4, return (None, 3, 32, 37)
         """
         if dim is None:
             dim = random.randint(*self.__tensor_dim_range)
         return (
             None,
-            *tuple(random.choices(range(self.__tensor_ele_size_range[0], self.__tensor_ele_size_range[1]+1), k=dim-1))
+            *tuple(random.choices(range(self.__tensor_ele_size_range[0], self.__tensor_ele_size_range[1] + 1),
+                                  k=dim - 1))
         )
+
+    def target_shape(self, old_shape: Tuple[int]) -> Tuple[int]:
+        """
+        Return a shuffled old_shape, here old_shape doesn't include the Batch axis
+        """
+        res_shape = list(old_shape)
+        random.shuffle(res_shape)
+        return tuple(res_shape)
 
     def kernel_size(self, window_max_shape: Tuple[int]) -> List[int]:
         length = random.randint(1, min(window_max_shape))
@@ -93,4 +100,16 @@ class VariableGenerator(object):
                 factors.append(i)
 
         return factors
+
+
+if __name__ == '__main__':
+    config = {
+        'tensor_dimension_range': 10,
+        'tensor_element_size_range': (2, 1024)
+    }
+
+    g = VariableGenerator(config=config)
+    print(g.shape(4))
+
+
 
