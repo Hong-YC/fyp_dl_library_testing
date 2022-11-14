@@ -6,15 +6,25 @@ def construct_layer_name(layer_id, layer_type, cell_type=''):
 
 def get_layer_func(layer_type):
     import torch
-    return getattr(torch.nn, layer_type)
+    if layer_type in torch_layer:
+        return getattr(torch, layer_type)
+    else:
+        return getattr(torch.nn, layer_type)
 
 
+torch_layer = [
+    'reshape'
+]
+
+torch_nn_layer = [
+    'Linear',
+    'Conv2d',
+    'Flatten'
+]
 seq_layer_types = [
     'Linear',
     'Conv2d',
     'Flatten'
-
-
 ]
 
 layer_types = seq_layer_types

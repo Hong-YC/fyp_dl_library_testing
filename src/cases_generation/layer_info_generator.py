@@ -50,9 +50,9 @@ class LayerInfo(object):
         else:
             output_shape = output_shape[1:]
         args = dict(
-            target_shape=output_shape
+            shape=(-1, *output_shape)
         )
-        return 'reshape', args, self.__output_shape.reshape_layer(**args)
+        return 'reshape', args, self.__output_shape.reshape_layer(output_shape)
 
     def Linear_layer(self, input_shape: Tuple[Optional[int]], out_features: Optional[int] = None):
         """
@@ -75,8 +75,8 @@ class LayerInfo(object):
         TODO: Flatten the input tensor within the start and end dimension
         """
         args = dict(
-            start_dim=None,
-            end_dim=None
+            start_dim=1, # Skip the batch dim
+            end_dim=-1
         )
         return 'Flatten', args, self.__output_shape.flatten_layer(input_shape=input_shape)
 
@@ -87,14 +87,14 @@ class LayerInfo(object):
         :return: 'conv2D', generated_arguments, output_shape
         """
 
-        out_channels, kernel_size, strides, groups = self.__random.conv_args(input_shape, dim_num=2)
+        out_channels, kernel_size, strides, padding, groups = self.__random.conv_args(input_shape, dim_num=2)
 
         args = dict(
             in_channels=input_shape[1],
             out_channels=out_channels,
             kernel_size=kernel_size,
-            strides=strides,
-            padding=self.__random.choice(["valid", "same"]),  # Improvement: Add int or tuple input
+            stride=strides,
+            padding=padding,  # Improvement: Add int or tuple input
             padding_mode=self.__random.choice(['zeros', 'reflect', 'replicate', 'circular']),
             # dilation=dilation,   Improvement: Add support for dilation
             groups=groups,
