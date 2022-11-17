@@ -34,35 +34,4 @@ def generate_layer(layer_info: dict):
     return layer_w_arg
 
 
-def __generate_model(json_path: str, weight_range: Tuple[float]):
-    # load model structure info
-    with open(json_path, 'r') as f:
-        model_info = json.load(f)
-
-    input_id_list, output_id_list = model_info['input_id_list'], model_info['output_id_list']
-
-    input_list, output_list, layer_dict = [], [], {}
-    for layer_id, layer_info in model_info['model_structure'].items():  # 按拓扑排序遍历
-        layer_id = int(layer_id)
-        # 生成层
-        layer, inbound_layers_idx, ouput_shape = generate_layer(layer_info)
-
-        # 层拼接
-        if layer_id in input_id_list:
-            layer_dict[layer_id] = layer  # input_object
-            input_list.append(layer_dict[layer_id])
-
-        else:
-            inbound_layers = [layer_dict[i] for i in inbound_layers_idx]
-            layer_dict[layer_id] = layer(inbound_layers[0] if len(inbound_layers) == 1 else inbound_layers)  # 对layers进行连接
-
-        if layer_id in output_id_list:
-            output_list.append(layer_dict[layer_id])
-
-        # 检查形状
-        from keras import backend as K
-        if K.int_shape(layer_dict[layer_id]) != tuple(ouput_shape):
-            raise Exception(f"[Debug] layer_id: {layer_id} expected shape: {tuple(ouput_shape)}  actual shape: {K.int_shape(layer_dict[layer_id])}")
-
-    return keras.Model(inputs=input_list, outputs=output_list)
 
