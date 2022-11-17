@@ -30,21 +30,21 @@ class TorchModel(nn.Module):
 
     def forward(self, input):
         """
-        :param input_dict: key: id(str), value: input_tensor
+        :param input: key: id(str), value: input_tensor
         """
         # Store the intermediate output of each layer
         # output_dict = input_dict.copy()
         output_dict = {self.input_id_list[0]: input}
         result_dict = {}
-        # TODO: Finish the forward function!!
+
         for layer_id, layer_info in self.model_structure.items():
             layer_type = layer_info.get("type")
             if layer_id not in self.input_id_list:
                 inbound_layers_idx = layer_info.get("pre_layers")
                 inbound_layers_output = [output_dict[i] for i in inbound_layers_idx]
-                print("Shape: ", inbound_layers_output[0].size())
+                # print("Shape: ", inbound_layers_output[0].size())
                 cur_layer = self.torch_layers[layer_id] if layer_type in torch_layer else self.torch_nn_layers[layer_id]
-                # store the output of current layer
+                # Store the output of current layer
                 output_dict[layer_id] = cur_layer(inbound_layers_output[0]) if \
                     len(inbound_layers_output) == 1 else cur_layer[layer_id](*inbound_layers_output)
                 # Store the result if it is an output layer
