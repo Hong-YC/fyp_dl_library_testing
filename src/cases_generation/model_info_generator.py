@@ -36,7 +36,7 @@ class ModelInfoGenerator(object):
         pre_layers = [] if pre_layer_id is None else [pre_layer_id]
         layer_type = pre_layer_type
         layer_name = None
-        skip = 0   # The number of nodes that are skipped
+        skip = 0  # The number of nodes that are skipped
         i = start_id
         while i < start_id + node_num:
             if not pre_layers:  # input layer
@@ -56,8 +56,10 @@ class ModelInfoGenerator(object):
                 # Linear layer will transform the tensor to (Batch, multiply_output_shape)
                 # Reshape layer will transform the tensor to (Batch, *output_shape)
                 last_three_layers = [self.__layer_generator.layer_infos.Flatten_layer,
-                                     partial(self.__layer_generator.layer_infos.Linear_layer, out_features=reduce(lambda x, y: x * y, output_shape[1:])),
-                                     partial(self.__layer_generator.layer_infos.reshape_layer, output_shape=output_shape)]
+                                     partial(self.__layer_generator.layer_infos.Linear_layer,
+                                             out_features=reduce(lambda x, y: x * y, output_shape[1:])),
+                                     partial(self.__layer_generator.layer_infos.reshape_layer,
+                                             output_shape=output_shape)]
 
                 layer_type, layer_args, cur_shape = last_three_layers[i - (start_id + node_num - 3)](cur_shape)
 
@@ -78,22 +80,21 @@ class ModelInfoGenerator(object):
             if self.__shape_too_big(cur_shape):
                 raise ValueError("Shape too big!!")
 
-            model_structure[j] = dict(type=layer_type,
-                                      args=dict(**layer_args, name=layer_name),
-                                      pre_layers=pre_layers,
-                                      output_shape=cur_shape)
-            pre_layers = [j]
+            model_structure[str(j)] = dict(type=layer_type,
+                                           args=dict(**layer_args, name=layer_name),
+                                           pre_layers=pre_layers,
+                                           output_shape=cur_shape)
+            pre_layers = [str(j)]
             i += 1
 
         return (
             dict(model_structure=model_structure,
-                 input_id_list=[start_id],
-                 output_id_list=[start_id + node_num - skip - 1]),
+                 input_id_list=[str(start_id)],
+                 output_id_list=[str(start_id + node_num - skip - 1)]),
             {construct_layer_name(start_id, 'input_object', cell_type): input_shape} if pre_layer_id is None else {},
             {layer_name: cur_shape},
             node_num - skip
         )
-
 
     def __shape_too_big(self, cur_shape):
         temp = 1
@@ -102,6 +103,7 @@ class ModelInfoGenerator(object):
                 return True
             temp *= e
         return temp > 1e8
+
 
 if __name__ == '__main__':
     config = {
@@ -112,9 +114,15 @@ if __name__ == '__main__':
     }
     m_info_generator = ModelInfoGenerator(config)
 
-    m_info = m_info_generator.generate_seq_model(6,  output_shape=(None, 3, 4))
+    m_info = m_info_generator.generate_seq_model(6, output_shape=(None, 3, 4))
     # print(m_info)
     # print(m_info[0]['model_structure'])
     # print(m_info[0]['input_id_list'])
     # print(m_info[0]['output_id_list'])
-    print(m_info[1])
+    # print(m_info[1])
+    from generate_one import __generate_layer
+
+    i = 4
+    print(m_info[0]['model_structure'][i])
+    actual_layer = __generate_layer(m_info[0]['model_structure'][i])
+    print(actual_layer[0])

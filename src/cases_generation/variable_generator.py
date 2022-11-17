@@ -55,12 +55,15 @@ class VariableGenerator(object):
         kernel_size = self.kernel_size(window_limitation)
         stride_limitation = [window_limitation[i] // kernel_size[i] for i in range(dim_num)]
         strides = self.sizes_with_limitation(stride_limitation)
-
+        if len(strides) != sum(strides):
+            padding = 'valid'
+        else:
+            padding = self.choice(["valid", "same"])
         # Generate the groups parameter
         gcd = math.gcd(input_shape[1], out_channels)
         groups = self.choice(self.getFactor(gcd))
 
-        return out_channels, kernel_size, strides, groups
+        return out_channels, kernel_size, strides, padding, groups
 
     def choice(self, seq: list):
         return random.choice(seq)
