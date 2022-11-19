@@ -1,8 +1,7 @@
 import torch.nn as nn
-from functools import partial
 from generate_one import generate_layer
 from model_info_generator import ModelInfoGenerator
-from utils import torch_layer
+from src.utils.utils import torch_layer
 from torchsummary import summary
 
 
@@ -42,11 +41,12 @@ class TorchModel(nn.Module):
             if layer_id not in self.input_id_list:
                 inbound_layers_idx = layer_info.get("pre_layers")
                 inbound_layers_output = [output_dict[i] for i in inbound_layers_idx]
-                # print("Shape: ", inbound_layers_output[0].size())
                 cur_layer = self.torch_layers[layer_id] if layer_type in torch_layer else self.torch_nn_layers[layer_id]
+
                 # Store the output of current layer
                 output_dict[layer_id] = cur_layer(inbound_layers_output[0]) if \
                     len(inbound_layers_output) == 1 else cur_layer[layer_id](*inbound_layers_output)
+
                 # Store the result if it is an output layer
                 if layer_id in self.output_id_list:
                     result_dict[layer_id] = output_dict[layer_id]
