@@ -24,7 +24,7 @@ class VariableGenerator(object):
         )
         return 'input_object', args, shape
 
-    def shape(self, dim: Optional[int] = None) -> tuple[None, Any]:
+    def shape(self, dim: Optional[int] = None) -> Tuple[None, Any]:
         """
         Return a randomly generated shape element,
         for example if dim = 4, return (None, 3, 32, 37)

@@ -1,9 +1,16 @@
 import torch.nn as nn
+from functools import partial
 from generate_one import generate_layer
 from model_info_generator import ModelInfoGenerator
-from src.utils.utils import torch_layer
+from utils import torch_layer
 from torchsummary import summary
-
+import torch
+import onnx
+import onnx_tf
+from onnx_tf.backend import prepare
+import numpy as np
+import onnxruntime
+from flask import Flask, session
 
 class TorchModel(nn.Module):
     def __init__(self, model_info: dict):
@@ -41,18 +48,18 @@ class TorchModel(nn.Module):
             if layer_id not in self.input_id_list:
                 inbound_layers_idx = layer_info.get("pre_layers")
                 inbound_layers_output = [output_dict[i] for i in inbound_layers_idx]
+                # print("Shape: ", inbound_layers_output[0].size())
                 cur_layer = self.torch_layers[layer_id] if layer_type in torch_layer else self.torch_nn_layers[layer_id]
-
                 # Store the output of current layer
                 output_dict[layer_id] = cur_layer(inbound_layers_output[0]) if \
                     len(inbound_layers_output) == 1 else cur_layer[layer_id](*inbound_layers_output)
-
                 # Store the result if it is an output layer
                 if layer_id in self.output_id_list:
                     result_dict[layer_id] = output_dict[layer_id]
 
         return result_dict
 
+    
 
 if __name__ == '__main__':
     config = {
@@ -67,7 +74,30 @@ if __name__ == '__main__':
     model = TorchModel(m_info[0])
 
     print(m_info[0]['model_structure'])
+    print(model)
     input_shape = m_info[1]["00_input_object"]
-    summary(model, input_shape[1:])
-
+    print(input_shape)
+    input_shape=(1,)+input_shape[1:]
+    print(input_shape)
+    dummy_input = torch.ones(*input_shape)
+    print(dummy_input)
+    model_onnx_path = "model.onnx"
+    torch.onnx.export(
+        model, dummy_input, model_onnx_path,
+        export_params=True,
+        opset_version=11,
+     # We define axes as dynamic to allow batch_size > 1
+    )
+    
+    model = onnx.load("model.onnx")
+    onnx.checker.check_model(model)
+    print(onnx.helper.printable_graph(model.graph))
+    def to_numpy(tensor: torch.Tensor):
+        return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
+    
+    input_sample = torch.ones(*input_shape)
+    print(input_sample)
+    ort_session = onnxruntime.InferenceSession(model_onnx_path)
+    ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input_sample)}
+    ort_outputs = ort_session.run(None, ort_inputs)
 
