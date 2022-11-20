@@ -8,7 +8,7 @@ class LayerInfoGenerator(object):
         super().__init__()
         self.layer_infos = LayerInfo(variable_generator)
 
-        from src.utils.utils import layer_types
+        from utils import layer_types
         self.__layer_funcs = {name: getattr(self.layer_infos, name + '_layer') for name in layer_types}
 
         # self.__selector = selector
