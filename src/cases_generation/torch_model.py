@@ -1,16 +1,9 @@
 import torch.nn as nn
-from functools import partial
-from generate_one import generate_layer
 from model_info_generator import ModelInfoGenerator
-from utils import torch_layer
+from generate_one import generate_layer
+from src.utils.utils import torch_layer
 from torchsummary import summary
-import torch
-import onnx
-import onnx_tf
-from onnx_tf.backend import prepare
-import numpy as np
-import onnxruntime
-from flask import Flask, session
+
 
 class TorchModel(nn.Module):
     def __init__(self, model_info: dict):
@@ -59,7 +52,6 @@ class TorchModel(nn.Module):
 
         return result_dict
 
-    
 
 if __name__ == '__main__':
     config = {
@@ -74,30 +66,5 @@ if __name__ == '__main__':
     model = TorchModel(m_info[0])
 
     print(m_info[0]['model_structure'])
-    print(model)
     input_shape = m_info[1]["00_input_object"]
-    print(input_shape)
-    input_shape=(1,)+input_shape[1:]
-    print(input_shape)
-    dummy_input = torch.ones(*input_shape)
-    print(dummy_input)
-    model_onnx_path = "model.onnx"
-    torch.onnx.export(
-        model, dummy_input, model_onnx_path,
-        export_params=True,
-        opset_version=11,
-     # We define axes as dynamic to allow batch_size > 1
-    )
-    
-    model = onnx.load("model.onnx")
-    onnx.checker.check_model(model)
-    print(onnx.helper.printable_graph(model.graph))
-    def to_numpy(tensor: torch.Tensor):
-        return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
-    
-    input_sample = torch.ones(*input_shape)
-    print(input_sample)
-    ort_session = onnxruntime.InferenceSession(model_onnx_path)
-    ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input_sample)}
-    ort_outputs = ort_session.run(None, ort_inputs)
-
+    summary(model, input_shape[1:])

@@ -1,7 +1,7 @@
 from typing import Optional, Tuple, List
 from pathlib import Path
 from functools import partial, reduce
-from utils import construct_layer_name
+from src.utils.utils import construct_layer_name
 from variable_generator import VariableGenerator
 from layer_info_generator import LayerInfoGenerator
 
