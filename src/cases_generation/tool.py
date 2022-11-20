@@ -1,4 +1,5 @@
 import numpy as np
+import onnxruntime
 from onnx import numpy_helper
 
 
@@ -24,3 +25,9 @@ def extract_pytorch_weight(model):
 def extract_ort_weight(model):
     weights = model.graph.initializer
     return [numpy_helper.to_array(weights[i]) for i in range(len(weights))]
+
+def ort_inference(onnx_path, input):
+    ort_session = onnxruntime.InferenceSession(onnx_path)
+    ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input)}
+    ort_outputs = ort_session.run(None, ort_inputs)
+    return ort_outputs
