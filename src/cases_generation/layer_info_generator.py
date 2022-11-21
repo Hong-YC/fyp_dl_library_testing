@@ -1,6 +1,6 @@
 from typing import Tuple, Optional
-from output_shape_calculator import OutputShapeCalculator
-from variable_generator import VariableGenerator
+from .output_shape_calculator import OutputShapeCalculator
+from .variable_generator import VariableGenerator
 
 
 class LayerInfoGenerator(object):
@@ -8,7 +8,7 @@ class LayerInfoGenerator(object):
         super().__init__()
         self.layer_infos = LayerInfo(variable_generator)
 
-        from utils import layer_types
+        from src.utils.utils import layer_types
         self.__layer_funcs = {name: getattr(self.layer_infos, name + '_layer') for name in layer_types}
 
         # self.__selector = selector
