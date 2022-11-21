@@ -1,7 +1,7 @@
 import torch.nn as nn
-from model_info_generator import ModelInfoGenerator
-from generate_one import generate_layer
-from src.utils.utils import torch_layer
+from .model_info_generator import ModelInfoGenerator
+from .generate_one import generate_layer
+from ..utils.utils import torch_layer
 from torchsummary import summary
 
 

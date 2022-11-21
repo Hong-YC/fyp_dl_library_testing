@@ -1,6 +1,6 @@
 from typing import Tuple, Optional
-from output_shape_calculator import OutputShapeCalculator
-from variable_generator import VariableGenerator
+from .output_shape_calculator import OutputShapeCalculator
+from .variable_generator import VariableGenerator
 
 
 class LayerInfoGenerator(object):
