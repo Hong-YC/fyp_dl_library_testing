@@ -23,11 +23,16 @@ if __name__ == '__main__':
     input_shape = m_info[1]["00_input_object"]
     # print(input_shape)
     # summary(model, input_shape[1:])
-    input_shape = (1,) + input_shape[1:]
+    # input_shape = (1,) + input_shape[1:]
+    input_shape = input_shape[1:]
     print(input_shape)
-    dummy_input = torch.ones(*input_shape)
-    print(dummy_input)
-    model_onnx_path = "./src/onnx_model/model.onnx"
+    summary(model, input_shape[1:])
+
+
+    # dummy_input = torch.ones(*input_shape)
+    # print(dummy_input)
+    # model_onnx_path = "./src/onnx_model/model.onnx"
+
     # torch.onnx.export(
     #     model, dummy_input, model_onnx_path,
     #     export_params=True,
@@ -35,12 +40,12 @@ if __name__ == '__main__':
     #     # We define axes as dynamic to allow batch_size > 1
     # )
     
-    model = onnx.load(model_onnx_path)
-    onnx.checker.check_model(model)
-    print(onnx.helper.printable_graph(model.graph))
-    input_sample = torch.ones(*input_shape)
-    print(input_sample)
-    ort_session = onnxruntime.InferenceSession(model_onnx_path)
-    ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input_sample)}
-    ort_outputs = ort_session.run(None, ort_inputs)
+    # model = onnx.load(model_onnx_path)
+    # onnx.checker.check_model(model)
+    # print(onnx.helper.printable_graph(model.graph))
+    # input_sample = torch.ones(*input_shape[1:])
+    # print(input_sample)
+    # ort_session = onnxruntime.InferenceSession(model_onnx_path)
+    # ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input_sample)}
+    # ort_outputs = ort_session.run(None, ort_inputs)
     
