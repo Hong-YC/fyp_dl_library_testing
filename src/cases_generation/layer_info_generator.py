@@ -95,7 +95,8 @@ class LayerInfo(object):
             kernel_size=kernel_size,
             stride=strides,
             padding=padding,  # Improvement: Add int or tuple input
-            padding_mode=self.__random.choice(['zeros', 'reflect', 'replicate', 'circular']),
+            # padding_mode=self.__random.choice(['zeros', 'reflect', 'replicate', 'circular']),
+            padding_mode=self.__random.choice(['reflect', 'replicate', 'circular']),
             # dilation=dilation,   Improvement: Add support for dilation
             groups=groups,
             bias=self.__random.boolean()

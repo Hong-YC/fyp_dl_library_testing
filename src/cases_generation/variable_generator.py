@@ -50,6 +50,8 @@ class VariableGenerator(object):
         return [length for _ in window_max_shape]
 
     def conv_args(self, input_shape: Tuple[int], dim_num: int):
+
+        # TODO: Support padding equals number!!!
         out_channels = self.ele_size()
         window_limitation = input_shape[2:2 + dim_num]
         kernel_size = self.kernel_size(window_limitation)
