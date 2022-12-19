@@ -13,7 +13,7 @@ class LayerInfoGenerator(object):
 
         # self.__selector = selector
 
-    def generate(self, input_shape: Tuple[Optional[int]], last_layer: Optional[str] = None, pool: Optional[list] = None):
+    def generate(self, input_shape: Tuple[Optional[int]], last_layer: Optional[str] = None, pool: Optional[list] = None, element: Optional[str] = None):
         """
         Generate a random layer name, parameter dict, and output shape
         :param input_shape:
@@ -29,7 +29,11 @@ class LayerInfoGenerator(object):
         #                                          input_dim=input_dim)
         # if element is None:  # No suitable layer type
         #     return None, None, input_shape
-        element = 'Conv2d'
+
+        # Hong: Temperal code
+        if element is None:
+            element = 'Conv2d'
+        
 
         if element is None:  # No suitable layer type
             return None, None, input_shape
