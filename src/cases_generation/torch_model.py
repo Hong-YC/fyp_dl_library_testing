@@ -5,6 +5,7 @@ from ..utils.utils import torch_layer
 from torchsummary import summary
 
 
+
 class TorchModel(nn.Module):
     def __init__(self, model_info: dict):
         super(TorchModel, self).__init__()

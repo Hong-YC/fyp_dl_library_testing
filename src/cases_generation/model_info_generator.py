@@ -4,14 +4,54 @@ from functools import partial, reduce
 from ..utils.utils import construct_layer_name
 from .variable_generator import VariableGenerator
 from .layer_info_generator import LayerInfoGenerator
+import json
 
 
 class ModelInfoGenerator(object):
-    def __init__(self, config: dict, selector=None):
+    def __init__(self, config: dict, generate_mode, db_manager, selector=None):
         super().__init__()
         self.__random = VariableGenerator(config['var'])
         self.__layer_generator = LayerInfoGenerator(self.__random, selector)
+        self.__generate_mode = generate_mode
+        self.__db_manager = db_manager
 
+    def generate(self, save_dir: str, node_num: Optional[int] = None):
+        """
+        Generate model information (Hong: Only support sequential for now)
+
+        Return:
+            json_path, input_shapes, model_id, exp_dir
+        """
+        # Randomly select number of nodes if not specified
+        # if node_num is None:
+        #     node_num = self.__random.randint_in_range(self.__node_num_range)
+
+        if self.__generate_mode == 'seq':
+            model_info, input_shapes, output_shapes, node_num = self.generate_seq_model(node_num=node_num)
+        # elif self.__generate_mode == 'merging':
+        #     model_info, input_shapes, output_shapes, node_num = self.generate_merge_model(node_num=node_num)
+        # elif self.__generate_mode == 'dag':
+        #     model_info, input_shapes, output_shapes, node_num = self.generate_dag_model(node_num=node_num)
+        # elif self.__generate_mode == 'template':
+        #     model_info, input_shapes, output_shapes, node_num = self.generate_template_model(cell_num=self.__cell_num, node_num_per_normal_cell=self.__node_num_per_normal_cell, node_num_per_reduction_cell=self.__node_num_per_reduction_cell)
+        else:
+            raise ValueError(f"UnKnown generate mode '{self.__generate_mode}'")
+
+
+        # Register model in the database
+        dataset_name = model_info.get('dataset_name', None)
+        model_id = self.__db_manager.register_model(dataset_name, node_num)
+
+        # Create experiment and model folders
+        exp_dir = Path(save_dir) / str(model_id).zfill(6)
+        model_dir = exp_dir / 'models'
+        model_dir.mkdir(parents=True, exist_ok=True)
+
+        json_path = model_dir / 'model.json'
+        with open(str(json_path), 'w') as f:
+            json.dump(model_info, f)
+
+        return json_path, input_shapes, output_shapes, model_id, str(exp_dir)
     def generate_seq_model(self, node_num: int, start_id: int = 0, pre_layer_id: Optional[int] = None,
                            pre_layer_type: Optional[str] = None,
                            input_shape: Optional[Tuple[Optional[int]]] = None,
