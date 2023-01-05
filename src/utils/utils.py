@@ -24,6 +24,7 @@ torch_nn_layer = [
 seq_layer_types = [
     'Linear',
     'Conv2d',
+    'Conv3d',
     'Flatten'
 ]
 

@@ -109,6 +109,30 @@ class LayerInfo(object):
         return 'Conv2d', args, self.__output_shape.conv_layer(input_shape=input_shape, dim_num=2, **args)
 
 
+    def Conv3d_layer(self, input_shape: Tuple[Optional[int]]):
+        """
+        Generate a 3D convolution layer with random parameters
+        :param input_shape: 5D (N, C, D, H, W )
+        :return: 'conv3D', generated_arguments, output_shape
+        """
+
+        out_channels, kernel_size, strides, padding, groups = self.__random.conv_args(input_shape, dim_num=3)
+
+        args = dict(
+            in_channels=input_shape[1],
+            out_channels=out_channels,
+            kernel_size=kernel_size,
+            stride=strides,
+            padding=padding,  # Improvement: Add int or tuple input
+            # padding_mode=self.__random.choice(['zeros', 'reflect', 'replicate', 'circular']),
+            padding_mode=self.__random.choice(['reflect', 'replicate', 'circular']),
+            # dilation=dilation,   Improvement: Add support for dilation
+            groups=groups,
+            bias=self.__random.boolean()
+        )
+
+        return 'Conv3d', args, self.__output_shape.conv_layer(input_shape=input_shape, dim_num=3, **args)
+
 if __name__ == '__main__':
     var_gen = VariableGenerator({'tensor_element_size_range': [10, 100], 'tensor_dimension_range': [2, 5]})
     lay_info_gen = LayerInfoGenerator(var_gen)
