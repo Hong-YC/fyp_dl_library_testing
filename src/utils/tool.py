@@ -36,3 +36,23 @@ def ort_inference(onnx_path, input):
     ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input)}
     ort_outputs = ort_session.run(None, ort_inputs)
     return ort_outputs
+
+
+# extract intermediate outputs of each layers of PyTorch models
+def extract_inter_output_pytorch(model,input):
+    # a helper function of forward hook in PyTorch
+    def get_activation_py(name):
+        def hook(model, input, output):
+            activation[name] = output.detach()
+        return hook
+
+    activation = {}
+    i=0
+    for name, module in model.named_modules():
+        if i==0:
+            i+=1
+            continue
+        module.register_forward_hook(get_activation_py(str(name)))
+        output = model(input)
+        i+=1
+    return activation
