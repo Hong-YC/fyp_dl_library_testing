@@ -35,13 +35,19 @@ class DataGenerator(object):
 
 if __name__ == '__main__':
     config = {
-        'instance_num': 5,
+        'instance_num': 8,
         'element_val_range': (-1000, 1000),
     }
     vig = DataGenerator(config)
     input_shape = (None, 3, 32, 32)
-    vig.generate({"test_input": input_shape}, "../data")
-    path = "../data/dataset/inputs.npz"
-    data = np.load(path)
-    print(data["test_input"].shape)
+    output_shape = (None, 3, 4)
+    vig.generate({"test_input": input_shape}, "../data", {"test_output": output_shape})
+    
+    
+    
+    
+    # vig.generate({"test_input": input_shape}, "../data")
+    # path = "../data/dataset/inputs.npz"
+    # data = np.load(path)
+    # print(data["test_input"].shape)
 
