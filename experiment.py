@@ -30,13 +30,13 @@ if __name__ == '__main__':
     with open(str(Path.cwd() / 'dummy_model.json'), 'w') as f:
         json.dump(m_info[0], f)
 
-    # model = TorchModel(m_info[0])
-    # print(model)
-    # input_shape = m_info[1]["00_input_object"]
+    model = TorchModel(m_info[0])
+    print(model)
+    input_shape = m_info[1]["00_input_object"]
  
 
-    # input_shape = input_shape[1:]
-    # print("Input shape: ", input_shape)
+    input_shape = input_shape[1:]
+    print("Input shape: ", input_shape)
 
     # model.to(device)
     # summary(model, input_shape)
