@@ -1,4 +1,4 @@
-train_dataloader = DataLoader(training_data, batch_size=64)
+# train_dataloader = DataLoader(training_data, batch_size=64)
 
 
 # training loop for PyTorch model
