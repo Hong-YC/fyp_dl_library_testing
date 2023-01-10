@@ -1,11 +1,12 @@
 import torch
 import torchvision
-from torch.utils.data import dataset
+from torch.utils.data import Dataset
 import numpy as np
 
 xy = np.load("../src/data/dataset/inputs.npz")
 haha = xy['test_input']
-print(np.shape(haha))
+print(xy.files)
+# print(np.shape(haha))
 
 
 # a dataset class template
