@@ -1,4 +1,6 @@
 __pycache__
 venv
 .idea
-testModel.py
+*.json
+onnx_model
+torch_model

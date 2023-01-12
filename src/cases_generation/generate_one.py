@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Tuple
 import warnings
 from functools import partial
-from ..utils.utils import get_layer_func, torch_layer
+from utils.utils import get_layer_func, torch_layer
 
 warnings.filterwarnings("ignore")
 
