@@ -1,9 +1,11 @@
 from typing import Optional, Tuple, List
 from pathlib import Path
 from functools import partial, reduce
-from ..utils.utils import construct_layer_name
+from utils.utils import construct_layer_name
 from .variable_generator import VariableGenerator
 from .layer_info_generator import LayerInfoGenerator
+
+
 import json
 
 
@@ -152,7 +154,10 @@ if __name__ == '__main__':
             'tensor_element_size_range': (2, 64)
         }
     }
-    m_info_generator = ModelInfoGenerator(config)
+    from utils.db_manager import DbManager
+    db_manager = DbManager(str(Path.cwd() / 'data' / 'dummy.db'))
+
+    m_info_generator = ModelInfoGenerator(config, 'seq', db_manager)
 
     m_info = m_info_generator.generate_seq_model(6, output_shape=(None, 3, 4))
     # print(m_info)
@@ -160,9 +165,7 @@ if __name__ == '__main__':
     # print(m_info[0]['input_id_list'])
     # print(m_info[0]['output_id_list'])
     # print(m_info[1])
-    from generate_one import __generate_layer
 
-    i = 4
-    print(m_info[0]['model_structure'][i])
-    actual_layer = __generate_layer(m_info[0]['model_structure'][i])
-    print(actual_layer[0])
+    print(m_info[0]['model_structure'])
+    # actual_layer = generate_layer(m_info[0]['model_structure'][i])
+    # print(actual_layer[0])

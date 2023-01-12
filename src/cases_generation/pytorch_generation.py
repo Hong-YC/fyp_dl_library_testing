@@ -3,7 +3,7 @@ import argparse
 import sys
 import json
 from pathlib import Path
-from src.cases_generation.torch_model import TorchModel
+from .torch_model import TorchModel
 
 
 
