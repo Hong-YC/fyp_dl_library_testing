@@ -3,4 +3,4 @@ venv
 .idea
 *.json
 onnx_model
-torch_model
+torch_models
