@@ -1,6 +1,2 @@
 __pycache__
-venv
-.idea
-*.json
 onnx_model
-*.pt
