@@ -16,7 +16,7 @@ class ModelGenerator(object):
         self.__timeout = timeout
     
     def generate(self, json_path: str, exp_dir: str):
-        model_dir = Path(exp_dir) / 'torch_models'
+        model_dir = Path(exp_dir) / 'models'
 
         # Generate model by Pytorch
         p = CmdProcess(f"python -m src.cases_generation.pytorch_generation"
