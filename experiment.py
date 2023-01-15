@@ -4,8 +4,8 @@ import onnxruntime
 import json
 from src.cases_generation.torch_model import TorchModel
 from src.cases_generation.model_info_generator import ModelInfoGenerator
-from src.utils.tool import to_numpy
-from src.utils.db_manager import DbManager
+from utils.tool import to_numpy
+from utils.db_manager import DbManager
 from pathlib import Path
 from torchsummary import summary
 
@@ -17,10 +17,6 @@ if __name__ == '__main__':
         }
     }
 
-    device = "cpu"
-    if torch.cuda.is_available():
-        device = "cuda:0"
-    
     db_manager = DbManager(str(Path.cwd() / 'data' / 'dummy.db'))
 
     m_info_generator = ModelInfoGenerator(config, 'seq', db_manager)
@@ -30,13 +26,18 @@ if __name__ == '__main__':
     with open(str(Path.cwd() / 'dummy_model.json'), 'w') as f:
         json.dump(m_info[0], f)
 
-    model = TorchModel(m_info[0])
-    print(model)
-    input_shape = m_info[1]["00_input_object"]
+    
+    # device = "cpu"
+    # if torch.cuda.is_available():
+    #     device = "cuda:0"
+    
+    # model = TorchModel(m_info[0])
+    # print(model)
+    # input_shape = m_info[1]["00_input_object"]
   
 
-    input_shape = input_shape[1:]
-    print("Input shape: ", input_shape)
+    # input_shape = input_shape[1:]
+    # print("Input shape: ", input_shape)
 
     # model.to(device)
     # summary(model, input_shape)
