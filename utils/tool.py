@@ -2,6 +2,7 @@ import numpy as np
 import onnxruntime
 from onnx import numpy_helper
 import torch
+import collections
 
 
 # some helper functions to check weight
@@ -56,3 +57,18 @@ def extract_inter_output_pytorch(model,input):
         output = model(input)
         i+=1
     return activation
+
+# extract intermediate outputs of each layers of ONNX models
+def extract_inter_output_onnx(model,input):
+    modelse=model
+    for node in modelse.graph.node:
+        for output in node.output:
+            modelse.graph.output.extend([onnx.ValueInfoProto(name=output)])
+
+    modelse = modelse.SerializeToString()
+    session = onnxruntime.InferenceSession(modelse)
+    outputs = [x.name for x in session.get_outputs()]
+    input_name = session.get_inputs()[0].name
+    outs = session.run(outputs, {input_name:input})
+    outs = collections.OrderedDict(zip(outputs, outs))
+    return outs
