@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     m_info_generator = ModelInfoGenerator(config, 'seq', db_manager)
 
-    m_info = m_info_generator.generate_seq_model(6, output_shape=(None, 3, 4))
+    m_info = m_info_generator.generate_seq_model(5, output_shape=(None, 3, 4), element = "Linear")
 
     with open(str(Path.cwd() / 'models/dummy_model.json'), 'w') as f:
         json.dump(m_info[0], f)
