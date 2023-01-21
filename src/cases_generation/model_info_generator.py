@@ -58,7 +58,8 @@ class ModelInfoGenerator(object):
                            pre_layer_type: Optional[str] = None,
                            input_shape: Optional[Tuple[Optional[int]]] = None,
                            output_shape: Optional[Tuple[Optional[int]]] = None,
-                           pool: Optional[list] = None, cell_type: str = ''):
+                           pool: Optional[list] = None, cell_type: str = '',
+                            element: Optional[str] = None):
         """
         Generate sequential model, return a model info description dict, input and output shape of the model
         :param node_num: Number of node. Required >= 3 if output shape are specified. (doesn't include input object)
@@ -85,7 +86,7 @@ class ModelInfoGenerator(object):
                 layer_type, layer_args, cur_shape = self.__random.input_object(shape=cur_shape)
                 input_shape = cur_shape  # record the input shape
 
-            # Last three layers will be flatten、dense and reshape if output shape is specified
+            # Last three layers will be flatten, dense and reshape if output shape is specified
             elif output_shape and i >= start_id + node_num - 3:
                 # # No need flatten (Hong: Skip for now, seems redundant)
                 # if i == start_id + node_num - 3 and len(cur_shape) <= 2:
@@ -106,9 +107,9 @@ class ModelInfoGenerator(object):
                 layer_type, layer_args, cur_shape = last_three_layers[i - (start_id + node_num - 3)](cur_shape)
 
             else:  # Middle layer
-                # Hong: We only consider Conv2d first
+                # Hong: If not specify layer type => Conv2D as defualt
                 layer_type, layer_args, cur_shape = self.__layer_generator.generate(cur_shape, last_layer=layer_type,
-                                                                                    pool=pool)
+                                                                                    pool=pool, element=element)
                 if layer_type is None:  # This means there is no suitable layer
                     skip += 1
                     i += 1

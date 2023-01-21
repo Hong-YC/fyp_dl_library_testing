@@ -34,10 +34,6 @@ class LayerInfoGenerator(object):
         if element is None:
             element = 'Conv2d'
         
-
-        if element is None:  # No suitable layer type
-            return None, None, input_shape
-
         return self.__layer_funcs[element](input_shape=input_shape)
 
 
