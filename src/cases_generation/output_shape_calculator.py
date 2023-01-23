@@ -33,4 +33,5 @@ class OutputShapeCalculator(object):
 
         return (*input_shape[:-dim_num - 1], out_channels, *new_shape)
 
-
+    def activation_layer(self, input_shape):
+        return input_shape

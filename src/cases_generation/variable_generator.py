@@ -9,6 +9,8 @@ class VariableGenerator(object):
         super().__init__()
         self.__tensor_dim_range = config['tensor_dimension_range']
         self.__tensor_ele_size_range = config['tensor_element_size_range']
+        self.__weight_val_range = config['weight_value_range']
+        self.__small_val_range = config['small_value_range']
 
     def input_object(self, shape: Optional[Tuple[Optional[int]]] = None):
         """
@@ -49,6 +51,29 @@ class VariableGenerator(object):
         length = random.randint(1, min(window_max_shape))
         return [length for _ in window_max_shape]
 
+    def val_size(self, must_positive: bool = False) -> float:
+        '''随机返回一个weight值
+        '''
+        a, b = self.__weight_val_range
+        if must_positive:
+            a = max(a, 0)
+        return random.random() * (b - a) + a
+
+    def activation_func(self):
+        '''随机返回一个激活函数
+        '''
+        return random.choice([
+            'relu',
+            'sigmoid',
+            'Softmax',
+            'softplus',
+            # 'softsign'  # x / (abs(x) + 1) 会导致值都很接近0.99,
+            'tanh',
+            'selu',
+            'elu',
+            'linear',
+        ])
+
     def conv_args(self, input_shape: Tuple[int], dim_num: int):
 
         # TODO: Support padding equals number!!!
@@ -83,6 +108,13 @@ class VariableGenerator(object):
         :return:
         """
         return random.randint(*self.__tensor_ele_size_range)
+    
+    def small_val(self):
+        """
+        Return a random float value within range [a,b]
+        """
+        a, b = self.__small_val_range
+        return random.random() * (b - a) + a
 
     def sizes_with_limitation(self, limitations: Tuple[int]) -> List[int]:
         """
