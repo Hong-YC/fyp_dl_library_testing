@@ -23,13 +23,24 @@ torch_nn_layer = [
 ]
 seq_layer_types = [
     'Linear',
+    'Conv1d',
     'Conv2d',
     'Conv3d',
     'Flatten'
 ]
 
-layer_types = seq_layer_types
+activation_layer_types = [
+    # 'activation',
+    'ReLU',
+    'Softmax',
+    'LeakyReLU',
+    # 'PReLU',
+    # 'ELU',
+    # 'thresholded_ReLU',
+]
 
+# layer_types = seq_layer_types
+layer_types = activation_layer_types
 
 if __name__ == '__main__':
     c = get_layer_func("Conv2d")

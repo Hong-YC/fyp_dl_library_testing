@@ -32,7 +32,7 @@ class LayerInfoGenerator(object):
 
         # Hong: Temperal code
         if element is None:
-            element = 'Conv2d'
+            element = 'Softmax'
         
         return self.__layer_funcs[element](input_shape=input_shape)
 
@@ -43,6 +43,11 @@ class LayerInfo(object):
         super().__init__()
         self.__output_shape = OutputShapeCalculator()
         self.__random = variable_generator
+
+    def activation_layer(self, input_shape: Tuple[Optional[int]]):
+        args = dict(activation=self.__random.activation_func())
+        print('----------------',args)
+        return 'activation', args, self.__output_shape.activation_layer(input_shape)
 
     def reshape_layer(self, input_shape: Tuple[Optional[int]], output_shape: Optional[Tuple[Optional[int]]] = None):
         if output_shape is None: # generate an output shape by randomly shuffle the input_shape
@@ -79,6 +84,32 @@ class LayerInfo(object):
             end_dim=-1
         )
         return 'Flatten', args, self.__output_shape.flatten_layer(input_shape=input_shape)
+
+    def Conv1d_layer(self, input_shape: Tuple[Optional[int]]):
+        """
+        Generate a 1D convolution layer with random parameters
+        :param input_shape: 3D (N, C, L)
+        :return: 'conv1D', generated_arguments, output_shape
+        """
+
+        out_channels, kernel_size, strides, padding, groups = self.__random.conv_args(input_shape, dim_num=1)
+
+        args = dict(
+            in_channels=input_shape[1],
+            out_channels=out_channels,
+            kernel_size=kernel_size,
+            stride=strides,
+            padding=padding,  # Improvement: Add int or tuple input
+            # padding_mode=self.__random.choice(['zeros', 'reflect', 'replicate', 'circular']),
+            padding_mode=self.__random.choice(['reflect', 'replicate', 'circular']),
+            # dilation=dilation,   Improvement: Add support for dilation
+            groups=groups,
+            bias=self.__random.boolean()
+        )
+
+        return 'Conv1d', args, self.__output_shape.conv_layer(input_shape=input_shape, dim_num=1, **args)
+
+
 
     def Conv2d_layer(self, input_shape: Tuple[Optional[int]]):
         """
@@ -129,6 +160,44 @@ class LayerInfo(object):
 
         return 'Conv3d', args, self.__output_shape.conv_layer(input_shape=input_shape, dim_num=3, **args)
 
+    def ReLU_layer(self, input_shape: Tuple[Optional[int]]):
+        args = dict(
+        )
+        return 'ReLU', args, self.__output_shape.activation_layer(input_shape)
+
+    def Softmax_layer(self, input_shape: Tuple[Optional[int]]):
+        args = dict(
+        )
+        return 'Softmax', args, self.__output_shape.activation_layer(input_shape)
+
+    def LeakyReLU_layer(self, input_shape: Tuple[Optional[int]]):
+        args = dict(
+            negative_slope = self.__random.small_val(),
+            inplace=False,
+        )
+        return 'LeakyReLU', args, self.__output_shape.activation_layer(input_shape)
+
+    def PReLU_layer(self, input_shape: Tuple[Optional[int]]):
+        args = dict(
+            alpha_initializer='random_uniform',
+            alpha_regularizer=None,
+            alpha_constraint=None,
+            shared_axes=self.__random.axis_list(len(input_shape)) if self.__random.boolean() else None,
+        )
+        return 'PReLU', args, self.__output_shape.activation_layer(input_shape)
+
+    def ELU_layer(self, input_shape: Tuple[Optional[int]]):
+        args = dict(
+            alpha=self.__random.small_val(),
+        )
+        return 'ELU', args, self.__output_shape.activation_layer(input_shape)
+
+    def thresholded_ReLU_layer(self, input_shape: Tuple[Optional[int]]):
+        args = dict(
+            theta=self.__random.small_val(),
+        )
+        return 'thresholded_ReLU', args, self.__output_shape.activation_layer(input_shape)
+        
 if __name__ == '__main__':
     var_gen = VariableGenerator({'tensor_element_size_range': [10, 100], 'tensor_dimension_range': [2, 5]})
     lay_info_gen = LayerInfoGenerator(var_gen)
