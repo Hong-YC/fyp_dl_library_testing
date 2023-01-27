@@ -8,6 +8,16 @@ import onnxruntime
 import numpy as np
 import collections
 from utils.tool import *
+from src.cases_generation.torch_model import TorchModel
+
+pair={}
+pair['Conv2d']='Conv'
+pair['ReLU']='Relu'
+pair['Linear']='Gemm'
+pair['Softmax']='Softmax'
+pair['Flatten']='Flatten'
+pair['reshape']='Reshape'
+pair['LeakyReLU']='LeakyRelu'
 
 def norm_delta(x, y, mode="max"):
     # infinite norm
@@ -63,4 +73,40 @@ def compare_pytorch_onnx(model_pytorch, model_onnx, inputs):
                 f.write(f"[ERROR] Crash when calculate inconsistencies between pytorch and onnx using {data}\n")
                 traceback.print_exc(file=f)
                 f.write("\n\n")
+
+if __name__ == '__main__':
+    #load pytorch model
+    with open('models/dummy_model.json', 'r') as f:
+        model_info = json.load(f)
+    model_torch=TorchModel(model_info)
+    model_torch.load_state_dict(torch.load("models/torch.pt"))
+    
+    #input shape
+    s=model_info['model_structure']['0']['args']['shape']
+    s.insert(0, 1)
+    dummy_input = torch.ones(s)
+    
+    #convert and load onnx model
+    model_onnx_path = "models/model.onnx"
+    torch.onnx.export(
+        model_torch, dummy_input, model_onnx_path,
+        export_params=True,
+        opset_version=11
+    )
+    model_onnx = onnx.load(model_onnx_path)
+    
+    #extract outputs
+    output_torch_pre=extract_inter_output_pytorch(model_torch,dummy_input)
+    name_list=list(output_torch_pre.keys())
         
+    outs=extract_inter_output_onnx(model_onnx,np.ones(s,dtype = np.float32))
+    output_onnx={}
+    cou=0
+    for node in model_onnx.graph.node:
+        if cou==len(name_list):
+            break
+        if pair[model_info['model_structure'][name_list[cou][-1]]['type']] in node.name:
+            output_onnx[name_list[cou]]=outs[node.output[0]]
+            cou=cou+1
+    print(output_onnx)
+            

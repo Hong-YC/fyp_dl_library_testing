@@ -14,7 +14,8 @@ if __name__ == '__main__':
         'var': {
             'tensor_dimension_range': (4, 4),
             'tensor_element_size_range': (2, 64),
-            'weight_value_range' : (5,6)
+            'weight_value_range' : (5,6),
+            'small_value_range' : (1,3)
         }
     }
 
@@ -22,9 +23,9 @@ if __name__ == '__main__':
 
     m_info_generator = ModelInfoGenerator(config, 'seq', db_manager)
 
-    m_info = m_info_generator.generate_seq_model(5, output_shape=(None, 3, 4), element = "Linear")
+    m_info = m_info_generator.generate_seq_model(5, output_shape=(None, 3, 4), element = "LeakyReLU")
 
-    with open(str(Path.cwd() / 'dummy_model.json'), 'w') as f:
+    with open(str(Path.cwd() / 'models/dummy_model.json'), 'w') as f:
         json.dump(m_info[0], f)
 
     
