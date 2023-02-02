@@ -21,11 +21,11 @@ pair['LeakyReLU']='LeakyRelu'
 
 def norm_delta(x, y, mode="max"):
     # infinite norm
-    if norm=="max":
+    if mode=="max":
         if x is None or y is None:
             return None
         return float(np.max(np.abs(x-y)))
-    elif norm=="l2":
+    elif mode=="l2":
         if x is None or y is None:
             return None
         return float(np.sum((x-y)*(x-y)))
@@ -91,6 +91,7 @@ if __name__ == '__main__':
     torch.onnx.export(
         model_torch, dummy_input, model_onnx_path,
         export_params=True,
+        output_names=['out'],
         opset_version=11
     )
     model_onnx = onnx.load(model_onnx_path)
@@ -108,5 +109,11 @@ if __name__ == '__main__':
         if pair[model_info['model_structure'][name_list[cou][-1]]['type']] in node.name:
             output_onnx[name_list[cou]]=outs[node.output[0]]
             cou=cou+1
-    print(output_onnx)
             
+    print(output_onnx)
+    
+    #compare model outputs
+    O_torch=list(model_torch(dummy_input).values())[0].detach().numpy()
+    O_onnx=outs['out']
+    dif=norm_delta(O_torch, O_onnx)
+    print(dif)
