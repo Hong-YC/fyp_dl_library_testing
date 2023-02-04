@@ -44,7 +44,7 @@ class Roulette(object):
         _sum = 0
         for el_name in pool:
             cond = self.__layer_conditions.get(el_name, None)
-            if cond is None or cond(**kwargs):  # available的layer
+            if cond is None or cond(**kwargs):  # if the layer is available 
                 candidates.append(self.__pool[el_name])
                 _sum += self.__pool[el_name].score
 

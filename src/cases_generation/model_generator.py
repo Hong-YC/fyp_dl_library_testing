@@ -8,19 +8,38 @@ from utils.cmd_process import CmdProcess
 
 class ModelGenerator(object):
 
-    def __init__(self, timeout):
+    def __init__(self, db_manager, selector, timeout):
         super().__init__()
-        # Hong: add database and selector support
-        # self.__db_manager = db_manager
-        # self.__selector = selector
+        self.__db_manager = db_manager
+        self.__selector = selector
         self.__timeout = timeout
     
-    def generate(self, json_path: str, exp_dir: str):
+    def generate(self, json_path: str, exp_dir: str, model_id: int):
+        """
+        Return whether the model is generated successfully (0 success, -1 fail)
+        """
         model_dir = Path(exp_dir) / 'models'
+        pytorch_generation_fail = False
 
-        # Generate model by Pytorch
+        # Generate model using Pytorch
         p = CmdProcess(f"python -m src.cases_generation.pytorch_generation"
                 f" --json_path {str(json_path)}"
                 f" --output_dir {str(model_dir)}")
 
         generate_status = p.run(self.__timeout)
+        # generate_status: Success = 0, Fail = -1
+
+        if generate_status:  # Generation Fail
+            self.__db_manager.update_model_generate_fail_backends(model_id, ['pytorch'])
+    
+        return generate_status
+
+    def __update_selected_layers_cnt(self, json_path):
+        with open(json_path, 'r') as f:
+            model_info = json.load(f)
+            for layer_info in model_info['model_structure'].values():
+                self.__selector.update(name=layer_info['type'])
+
+
+if __name__ == '__main__':
+    pass
