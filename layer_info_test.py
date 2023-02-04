@@ -15,5 +15,5 @@ if __name__ == '__main__':
     'weight_value_range':[-10.0,10.0],
     'small_value_range':(0, 1)})
     lay_info_gen = LayerInfoGenerator(var_gen)
-    info = lay_info_gen.generate((1,0,1,2,3), element='LeakyReLU')
+    info = lay_info_gen.generate((10,3,100), element='Max_Pool1D')
     print(info[0], info[1], info[2])

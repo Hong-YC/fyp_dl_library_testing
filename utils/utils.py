@@ -36,7 +36,8 @@ seq_layer_types = [
     'Conv1d',
     'Conv2d',
     'Conv3d',
-    'Flatten'
+    'Flatten',
+    'Max_Pool1D'
 ]
 
 activation_layer_types = [
@@ -44,9 +45,9 @@ activation_layer_types = [
     'ReLU',
     'Softmax',
     'LeakyReLU',
-    # 'PReLU',
-    # 'ELU',
-    # 'thresholded_ReLU',
+    'PReLU',
+    'ELU',
+    'Threshold',
 ]
 
 # layer_types = seq_layer_types

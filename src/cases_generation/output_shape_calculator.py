@@ -35,3 +35,19 @@ class OutputShapeCalculator(object):
 
     def activation_layer(self, input_shape):
         return input_shape
+
+    # def pooling_layer(self, input_shape, dim_num, kernel_size, stride, padding, dilation, data_format, **kwargs):
+    #     is_channels_last = (data_format == "channels_last")
+    #     old_steps = input_shape[-1-dim_num:-1] if is_channels_last else input_shape[-dim_num:]
+
+    #     plus = [2*padding - dilation*(kernel_size[i]-1) -1 for i in range(dim_num)]
+    #     # plus = [0 if padding == 'valid' else kernel_size[i] - 1 for i in range(dim_num)]
+    #     strides = kernel_size if stride == 0 else stride
+    #     new_steps = [(old_steps[i] + plus[i]) // stride[i] + 1 for i in range(dim_num)]
+    #     return (*input_shape[:-1-dim_num], *new_steps, input_shape[-1]) if is_channels_last else (*input_shape[:-dim_num], *new_steps)
+
+
+    def pool1D_layer(self, input_shape, kernel_size, stride, padding, dilation, **kwargs):
+        length_out = (input_shape[-1] + 2* padding - dilation*(kernel_size-1)-1) // stride + 1
+        return (*input_shape[:-1],length_out)
+        # return self.pooling_layer(input_shape, 1, [kernel_size], [kernel_size] if stride == 0 else [stride], padding, dilation, "channels_last", **kwargs)

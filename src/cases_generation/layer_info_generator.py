@@ -179,25 +179,40 @@ class LayerInfo(object):
 
     def PReLU_layer(self, input_shape: Tuple[Optional[int]]):
         args = dict(
-            alpha_initializer='random_uniform',
-            alpha_regularizer=None,
-            alpha_constraint=None,
-            shared_axes=self.__random.axis_list(len(input_shape)) if self.__random.boolean() else None,
+            num_parameters = 1,  # Jingyu todo: support channels? how to tell which index is channel
+            init = self.__random.small_val(),
         )
         return 'PReLU', args, self.__output_shape.activation_layer(input_shape)
 
     def ELU_layer(self, input_shape: Tuple[Optional[int]]):
         args = dict(
             alpha=self.__random.small_val(),
+            inplace=self.__random.choice([True, False])
         )
         return 'ELU', args, self.__output_shape.activation_layer(input_shape)
 
-    def thresholded_ReLU_layer(self, input_shape: Tuple[Optional[int]]):
+    def Threshold_layer(self, input_shape: Tuple[Optional[int]]):
         args = dict(
-            theta=self.__random.small_val(),
+            threshold_layer=self.__random.small_val(),
+            value=self.__random.randint_in_range([-10**10,1010]),
+            inplace=self.__random.choice([True, False])
         )
         return 'thresholded_ReLU', args, self.__output_shape.activation_layer(input_shape)
-        
+
+    def Max_Pool1D_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入3D向量
+        '''
+        kernel_size = self.__random.kernel_size(input_shape[2:])[0]
+        args = dict(
+            kernel_size = kernel_size, # input_shape:
+            stride = self.__random.sizes_with_limitation(input_shape[2:])[0] ,
+            padding = self.__random.sizes_with_limitation_zero([kernel_size//2])[0],
+            dilation = self.__random.sizes_with_limitation([input_shape[2]//kernel_size])[0],
+            return_indices = self.__random.choice([True, False]),
+            ceil_mode = self.__random.choice([True, False]),
+        )
+        return 'Max_Pool1D', args, self.__output_shape.pool1D_layer(input_shape=input_shape, **args)
+
 if __name__ == '__main__':
     var_gen = VariableGenerator({'tensor_element_size_range': [10, 100], 'tensor_dimension_range': [2, 5]})
     lay_info_gen = LayerInfoGenerator(var_gen)

@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, List, Optional, Any
+from typing import Tuple, List, Optional, Any,Iterable
 import math
 
 
@@ -116,6 +116,16 @@ class VariableGenerator(object):
         a, b = self.__small_val_range
         return random.random() * (b - a) + a
 
+    def kernel_size(self, window_max_shape: Tuple[int]) -> List[int]:
+        length = random.randint(1, min(window_max_shape))
+        return [length for _ in window_max_shape]
+    
+    def randint_in_range(self, ran: Iterable) -> int:
+        '''
+        Return a random integer within range [a,b]
+        '''
+        return random.randint(*ran)    
+
     def sizes_with_limitation(self, limitations: Tuple[int]) -> List[int]:
         """
         Return a random generated list with the same dimension and satisfy
@@ -124,6 +134,15 @@ class VariableGenerator(object):
         :return:
         """
         return [random.randint(1, limit) for limit in limitations]
+
+    def sizes_with_limitation_zero(self, limitations: Tuple[int]) -> List[int]:
+        """
+        Return a random generated list with the same dimension and satisfy
+        the limitations
+        :param limitations:
+        :return:
+        """
+        return [random.randint(0, limit) for limit in limitations]
 
     def getFactor(self, input_number: int) -> List[int]:
         """
