@@ -15,7 +15,7 @@ class converter(object):
         self.dir_json=dir_json
         self.dir_onnx=dir_onnx
         
-    def convert(self):
+    def convert(self, version=12):
         with open(self.dir_json, 'r') as f:
             model_info = json.load(f)
         model_torch=TorchModel(model_info)
@@ -27,5 +27,5 @@ class converter(object):
             model_torch, dummy_input, self.dir_onnx,
             export_params=True,
             output_names=["out"],
-            opset_version=11
+            opset_version=version
         )
