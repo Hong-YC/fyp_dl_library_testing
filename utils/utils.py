@@ -38,7 +38,8 @@ seq_layer_types = [
     'Conv3d',
     'Flatten',
     'Max_Pool1D',
-    'Max_Pool2D'
+    'Max_Pool2D',
+    'Max_Pool3D'
 ]
 
 activation_layer_types = [

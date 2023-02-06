@@ -232,7 +232,24 @@ class LayerInfo(object):
         )
         return 'Max_Pool2D', args, self.__output_shape.pool2D_layer(input_shape=input_shape,**args)
 
-
+    def Max_Pool3D_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入5D向量
+        '''
+        window_limitation = input_shape[2:] # (D,H,W)
+        kernel_size = self.__random.kernel_size(window_limitation) # (D,H,W)
+        args = dict(
+            kernel_size = kernel_size,
+            stride = self.__random.sizes_with_limitation(window_limitation) if self.__random.boolean() else kernel_size,
+            padding = self.__random.sizes_with_limitation_zero([i//2 for i in kernel_size]),
+            dilation = self.__random.sizes_with_limitation([window_limitation[i]//kernel_size[i] for i in range(3)]),
+            return_indices = self.__random.choice([True, False]),
+            ceil_mode = self.__random.choice([True, False]),
+            # pool_size=self.__random.kernel_size(window_limitation),
+            # strides=self.__random.sizes_with_limitation(window_limitation) if self.__random.boolean() else None,
+            # padding=self.__random.choice(["valid", "same"]),
+            # data_format="channels_last" if is_channels_last else "channels_first",
+        )
+        return 'Max_Pool3D', args, self.__output_shape.pool3D_layer(input_shape=input_shape,**args)
 
 if __name__ == '__main__':
     var_gen = VariableGenerator({'tensor_element_size_range': [10, 100], 'tensor_dimension_range': [2, 5]})

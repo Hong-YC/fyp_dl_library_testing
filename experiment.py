@@ -12,7 +12,7 @@ from torchsummary import summary
 if __name__ == '__main__':
     config = {
         'var': {
-            'tensor_dimension_range': (3,3),
+            'tensor_dimension_range': (5,5),
             'tensor_element_size_range': (2, 64),
             'weight_value_range' : (5,6),
             'small_value_range' : (1,3)
@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     m_info_generator = ModelInfoGenerator(config, 'seq', db_manager)
 
-    m_info = m_info_generator.generate_seq_model(5, output_shape=(None, 3, 4), element = "Max_Pool1D")
+    m_info = m_info_generator.generate_seq_model(5, output_shape=(None, 3, 4), element = "Max_Pool3D")
 
     print('?????????????',m_info)
     with open(str(Path.cwd() / 'models/dummy_model.json'), 'w') as f:

@@ -56,3 +56,9 @@ class OutputShapeCalculator(object):
         H_out = (input_shape[-2] + 2*padding[0] - dilation[0]*(kernel_size[0]-1)-1) // stride[0] + 1 if not ceil_mode else math.ceil((input_shape[-2] + 2*padding[0] - dilation[0]*(kernel_size[0]-1)-1) / stride[0] + 1)
         W_out = (input_shape[-1] + 2*padding[1] - dilation[1]*(kernel_size[1]-1)-1) // stride[1] + 1 if not ceil_mode else math.ceil((input_shape[-1] + 2*padding[1] - dilation[1]*(kernel_size[1]-1)-1) / stride[1] + 1)
         return (*input_shape[:-2],H_out,W_out)
+
+    def pool3D_layer(self, input_shape, kernel_size, stride, padding, dilation, ceil_mode, **kwargs):
+        D_out = (input_shape[-3] + 2*padding[0] - dilation[0]*(kernel_size[0]-1)-1) // stride[0] + 1 if not ceil_mode else math.ceil((input_shape[-3] + 2*padding[0] - dilation[0]*(kernel_size[0]-1)-1) / stride[0] + 1)
+        H_out = (input_shape[-2] + 2*padding[1] - dilation[1]*(kernel_size[1]-1)-1) // stride[1] + 1 if not ceil_mode else math.ceil((input_shape[-2] + 2*padding[1] - dilation[1]*(kernel_size[1]-1)-1) / stride[1] + 1)
+        W_out = (input_shape[-1] + 2*padding[2] - dilation[2]*(kernel_size[2]-1)-1) // stride[2] + 1 if not ceil_mode else math.ceil((input_shape[-1] + 2*padding[2] - dilation[2]*(kernel_size[2]-1)-1) / stride[2] + 1)
+        return (*input_shape[:-3],D_out,H_out,W_out)
