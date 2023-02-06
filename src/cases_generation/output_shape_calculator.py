@@ -47,7 +47,12 @@ class OutputShapeCalculator(object):
     #     return (*input_shape[:-1-dim_num], *new_steps, input_shape[-1]) if is_channels_last else (*input_shape[:-dim_num], *new_steps)
 
 
-    def pool1D_layer(self, input_shape, kernel_size, stride, padding, dilation, **kwargs):
-        length_out = (input_shape[-1] + 2* padding - dilation*(kernel_size-1)-1) // stride + 1
+    def pool1D_layer(self, input_shape, kernel_size, stride, padding, dilation, ceil_mode, **kwargs):
+        length_out = (input_shape[-1] + 2* padding - dilation*(kernel_size-1)-1) // stride + 1 if not ceil_mode else math.ceil((input_shape[-1] + 2* padding - dilation*(kernel_size-1)-1) / stride + 1)
         return (*input_shape[:-1],length_out)
         # return self.pooling_layer(input_shape, 1, [kernel_size], [kernel_size] if stride == 0 else [stride], padding, dilation, "channels_last", **kwargs)
+    
+    def pool2D_layer(self, input_shape, kernel_size, stride, padding, dilation, ceil_mode, **kwargs):
+        H_out = (input_shape[-2] + 2*padding[0] - dilation[0]*(kernel_size[0]-1)-1) // stride[0] + 1 if not ceil_mode else math.ceil((input_shape[-2] + 2*padding[0] - dilation[0]*(kernel_size[0]-1)-1) / stride[0] + 1)
+        W_out = (input_shape[-1] + 2*padding[1] - dilation[1]*(kernel_size[1]-1)-1) // stride[1] + 1 if not ceil_mode else math.ceil((input_shape[-1] + 2*padding[1] - dilation[1]*(kernel_size[1]-1)-1) / stride[1] + 1)
+        return (*input_shape[:-2],H_out,W_out)

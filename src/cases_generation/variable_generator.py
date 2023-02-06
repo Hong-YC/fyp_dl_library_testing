@@ -118,7 +118,7 @@ class VariableGenerator(object):
 
     def kernel_size(self, window_max_shape: Tuple[int]) -> List[int]:
         length = random.randint(1, min(window_max_shape))
-        return [length for _ in window_max_shape]
+        return [random.randint(1, min(window_max_shape)) for _ in window_max_shape]
     
     def randint_in_range(self, ran: Iterable) -> int:
         '''
@@ -126,23 +126,24 @@ class VariableGenerator(object):
         '''
         return random.randint(*ran)    
 
-    def sizes_with_limitation(self, limitations: Tuple[int]) -> List[int]:
+    # def sizes_with_limitation(self, limitations: Tuple[int]) -> List[int]:
+    #     """
+    #     Return a random generated list with the same dimension and satisfy
+    #     the limitations
+    #     :param limitations:
+    #     :return:
+    #     """
+    #     return [random.randint(1, limit) for limit in limitations]
+    def sizes_with_limitation(self, window_max_shape: Tuple[int]) -> List[int]:
+        return [random.randint(1, min(window_max_shape)) for _ in window_max_shape]
+    def sizes_with_limitation_zero(self, window_max_shape: Tuple[int]) -> List[int]:
         """
         Return a random generated list with the same dimension and satisfy
         the limitations
         :param limitations:
         :return:
         """
-        return [random.randint(1, limit) for limit in limitations]
-
-    def sizes_with_limitation_zero(self, limitations: Tuple[int]) -> List[int]:
-        """
-        Return a random generated list with the same dimension and satisfy
-        the limitations
-        :param limitations:
-        :return:
-        """
-        return [random.randint(0, limit) for limit in limitations]
+        return [random.randint(0, min(window_max_shape)) for _ in window_max_shape]
 
     def getFactor(self, input_number: int) -> List[int]:
         """
