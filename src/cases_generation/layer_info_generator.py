@@ -251,6 +251,52 @@ class LayerInfo(object):
         )
         return 'Max_Pool3D', args, self.__output_shape.pool3D_layer(input_shape=input_shape,**args)
 
+    def AvgPool1d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入3D向量
+        '''
+        kernel_size = self.__random.kernel_size(input_shape[2:])[0]
+        args = dict(
+            kernel_size = kernel_size,
+            stride = self.__random.sizes_with_limitation(input_shape[2:])[0] ,
+            padding = self.__random.sizes_with_limitation_zero([kernel_size//2])[0],
+            ceil_mode = self.__random.choice([True, False]),
+            count_include_pad = self.__random.choice([True, False]),
+        )
+        return 'AvgPool1d', args, self.__output_shape.AvgPool1d_layer(input_shape=input_shape, **args)
+
+    def AvgPool2d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入4D向量
+        '''
+        window_limitation = input_shape[2:] # (H,W)
+        kernel_size = self.__random.kernel_size(window_limitation) # (H,W)
+        args = dict(
+            kernel_size = kernel_size,
+            stride = self.__random.sizes_with_limitation(window_limitation) if self.__random.boolean() else kernel_size,
+            padding = self.__random.sizes_with_limitation_zero([i//2 for i in kernel_size]),
+            ceil_mode = self.__random.choice([True, False]),
+            count_include_pad = self.__random.choice([True, False]),
+            divisor_override = None if self.__random.boolean() else self.__random.randint_in_range([1,10**10])
+        )
+        
+        return 'AvgPool2d', args, self.__output_shape.AvgPool2d_layer(input_shape=input_shape, **args)
+
+    def AvgPool3d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入5D向量
+        '''
+        window_limitation = input_shape[2:] # (D,H,W)
+        kernel_size = self.__random.kernel_size(window_limitation) # (D,H,W)
+        args = dict(
+            kernel_size = kernel_size,
+            stride = self.__random.sizes_with_limitation(window_limitation) if self.__random.boolean() else kernel_size,
+            padding = self.__random.sizes_with_limitation_zero([i//2 for i in kernel_size]),
+            ceil_mode = self.__random.choice([True, False]),
+            count_include_pad = self.__random.choice([True, False]),
+            divisor_override = None if self.__random.boolean() else self.__random.randint_in_range([1,10**10])
+        )
+        
+        return 'AvgPool3d', args, self.__output_shape.AvgPool3d_layer(input_shape=input_shape, **args)
+
+
 if __name__ == '__main__':
     var_gen = VariableGenerator({'tensor_element_size_range': [10, 100], 'tensor_dimension_range': [2, 5]})
     lay_info_gen = LayerInfoGenerator(var_gen)

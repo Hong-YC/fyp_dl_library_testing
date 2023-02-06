@@ -39,7 +39,10 @@ seq_layer_types = [
     'Flatten',
     'Max_Pool1D',
     'Max_Pool2D',
-    'Max_Pool3D'
+    'Max_Pool3D',
+    'AvgPool1d',
+    'AvgPool2d',
+    'AvgPool3d'
 ]
 
 activation_layer_types = [
