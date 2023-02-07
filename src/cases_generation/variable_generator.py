@@ -117,7 +117,6 @@ class VariableGenerator(object):
         return random.random() * (b - a) + a
 
     def kernel_size(self, window_max_shape: Tuple[int]) -> List[int]:
-        length = random.randint(1, min(window_max_shape))
         return [random.randint(1, min(window_max_shape)) for _ in window_max_shape]
     
     def randint_in_range(self, ran: Iterable) -> int:

@@ -1,6 +1,7 @@
 from typing import Tuple, Optional
 from .output_shape_calculator import OutputShapeCalculator
 from .variable_generator import VariableGenerator
+import math,random
 
 
 class LayerInfoGenerator(object):
@@ -295,6 +296,34 @@ class LayerInfo(object):
         )
         
         return 'AvgPool3d', args, self.__output_shape.AvgPool3d_layer(input_shape=input_shape, **args)
+
+    def FractionalMaxPool2d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入4D向量
+        '''        
+        window_limitation = input_shape[2:] # (H,W)
+        kernel_size = self.__random.kernel_size(window_limitation) # (H,W)
+        output_size = None if self.__random.boolean() else self.__random.sizes_with_limitation([math.ceil(i/2) for i in kernel_size])
+        args = dict(
+            kernel_size = kernel_size,
+            output_size = output_size,
+            output_ratio = None if output_size else [random.uniform(0,1) for i in range(2)],
+            return_indices = self.__random.choice([True, False]),
+        )
+        return 'FractionalMaxPool2d', args, self.__output_shape.FractionalMaxPool2d_layer(input_shape=input_shape, **args)
+
+    def FractionalMaxPool3d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入5D向量
+        '''        
+        window_limitation = input_shape[2:] # (T,H,W)
+        kernel_size = self.__random.kernel_size(window_limitation) # (T,H,W)
+        output_size = None if self.__random.boolean() else self.__random.sizes_with_limitation([math.ceil(i/2) for i in kernel_size])
+        args = dict(
+            kernel_size = kernel_size,
+            output_size = output_size,
+            output_ratio = None if output_size else [random.uniform(0,1) for i in range(3)],
+            return_indices = self.__random.choice([True, False]),
+        )
+        return 'FractionalMaxPool3d', args, self.__output_shape.FractionalMaxPool3d_layer(input_shape=input_shape, **args)
 
 
 if __name__ == '__main__':
