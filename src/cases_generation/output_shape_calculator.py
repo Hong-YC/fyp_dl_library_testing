@@ -77,3 +77,11 @@ class OutputShapeCalculator(object):
         H_out = math.floor((input_shape[-2] + 2*padding[1] - kernel_size[1])/stride[1] + 1) if not ceil_mode else math.ceil((input_shape[-2] + 2*padding[1] - kernel_size[1])/stride[1] + 1)
         W_out = math.floor((input_shape[-1] + 2*padding[2] - kernel_size[2])/stride[2] + 1) if not ceil_mode else math.ceil((input_shape[-1] + 2*padding[2] - kernel_size[2])/stride[2] + 1)
         return (*input_shape[:-2],D_out,H_out,W_out)
+
+    def FractionalMaxPool2d_layer(self, input_shape, kernel_size, output_size, output_ratio, return_indices):
+        H_out, W_out = output_size if output_size else [math.floor(input_shape[2+i] * output_ratio[i]) for i in range(2)]
+        return (*input_shape[:-2],H_out,W_out)
+    
+    def FractionalMaxPool3d_layer(self, input_shape, kernel_size, output_size, output_ratio, return_indices):
+        T_out, H_out, W_out = output_size if output_size else [math.floor(input_shape[2+i] * output_ratio[i]) for i in range(3)]
+        return (*input_shape[:-3],T_out,H_out,W_out)    

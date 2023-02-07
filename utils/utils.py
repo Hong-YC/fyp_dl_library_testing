@@ -42,7 +42,9 @@ seq_layer_types = [
     'Max_Pool3D',
     'AvgPool1d',
     'AvgPool2d',
-    'AvgPool3d'
+    'AvgPool3d',
+    'FractionalMaxPool2d',
+    'FractionalMaxPool3d'
 ]
 
 activation_layer_types = [
