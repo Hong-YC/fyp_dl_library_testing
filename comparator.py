@@ -41,6 +41,8 @@ class comparator(object):
         #load onnx model
         self.model_onnx = onnx.load(self.dir_onnx)
         
+        
+    def extract(self, input):
         #extract outputs
         self.output_torch=extract_inter_output_pytorch(self.model_torch,input)
         self.name_list=list(self.output_torch.keys())
@@ -57,8 +59,21 @@ class comparator(object):
                 cou=cou+1
 
     def compare_inference(self, input, epsilon=1e-4):
-        O_torch=list(self.model_torch(input).values())[0].detach().numpy()
-        O_onnx=self.output_onnx['out']
+        O_torch=None
+        O_onnx=None
+        try:
+            O_torch=list(self.model_torch(input).values())[0].detach().numpy()
+        except:
+            return None
+        try:
+            sess = onnxruntime.InferenceSession(self.dir_onnx)
+            input_name = sess.get_inputs()[0].name
+            label_name = sess.get_outputs()[0].name
+            ins=input.numpy()
+            result = sess.run(None, {input_name: ins})
+            O_onnx=result[0]
+        except:
+            return None
         dif=norm_delta(O_torch, O_onnx)
         if dif>epsilon:
             return dif
