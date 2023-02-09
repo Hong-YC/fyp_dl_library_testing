@@ -16,7 +16,8 @@ if __name__ == '__main__':
             'tensor_element_size_range': (2, 64),
             'weight_value_range' : (5,6),
             'small_value_range' : (1,3)
-        }
+        },
+        'node_num_range': (5, 5),
     }
 
     db_manager = DbManager(str(Path.cwd() / 'data' / 'dummy.db'))
@@ -30,12 +31,12 @@ if __name__ == '__main__':
         json.dump(m_info[0], f)
 
     
-    # device = "cpu"
-    # if torch.cuda.is_available():
-    #     device = "cuda:0"
+    device = "cpu"
+    if torch.cuda.is_available():
+        device = "cuda:0"
     
-    # model = TorchModel(m_info[0])
-    # print(model)
+    model = TorchModel(m_info[0])
+    print(model)
     # input_shape = m_info[1]["00_input_object"]
   
 
