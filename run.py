@@ -28,6 +28,31 @@ class TrainingDebugger(object):
         # self.__weights_trainer = Trainer(self.__db_manager, timeout)
         # self.__weights_comparator = Comparator(self.__db_manager)
 
+    def run_generation(self):
+        """
+        Generate pytorch model and data randomly
+        """
+        # Generate random Pytorch model
+        print('Model generation start...')
+        json_path, model_input_shapes, model_output_shapes, model_id, exp_dir = self.__model_info_generator.generate(save_dir=self.__output_dir)
+        torch_gen_status = self.__model_generator.generate(json_path=json_path,
+                                                      exp_dir=exp_dir,
+                                                      model_id=model_id)
+        if torch_gen_status:
+            # Convert to ONNX
+            
+
+        print(f'Model generation complete: model_id={model_id} ok_backends={ok_backends}')
+
+        if torch_gen_status:  
+            print("Generate training data")
+            self.__training_data_generator.generate(input_shapes=model_input_shapes,
+                                                        output_shapes=model_output_shapes,
+                                                        exp_dir=exp_dir)
+            print("Data generation complete")
+        
+
+        return model_id, exp_dir, ok_backends
 
 
 def main(testing_config):
