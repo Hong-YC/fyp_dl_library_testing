@@ -19,7 +19,7 @@ pair['Flatten']='Flatten'
 pair['reshape']='Reshape'
 pair['LeakyReLU']='LeakyRelu'
 
-class comparator(object):
+class Comparator(object):
 
     def __init__(self, dir_torch, dir_json, dir_onnx):
         super().__init__()
@@ -27,24 +27,20 @@ class comparator(object):
         self.dir_json=dir_json
         self.dir_onnx=dir_onnx
 
-    def preprare(self, input):
         #prepare models
         with open(self.dir_json, 'r') as f:
             self.model_info = json.load(f)
         self.model_torch=TorchModel(self.model_info)
         self.model_torch.load_state_dict(torch.load(self.dir_torch))
-        
-        #input shape
-        self.input_shape=self.model_info['model_structure']['0']['args']['shape']
-        self.input_shape.insert(0, 1)
-        
+
         #load onnx model
         self.model_onnx = onnx.load(self.dir_onnx)
         
         
+        
     def extract(self, input):
         #extract outputs
-        self.output_torch=extract_inter_output_pytorch(self.model_torch,input)
+        self.output_torch=extract_inter_output_pytorch(self.model_torch, input)
         self.name_list=list(self.output_torch.keys())
             
         outs=extract_inter_output_onnx(self.model_onnx,input.numpy())

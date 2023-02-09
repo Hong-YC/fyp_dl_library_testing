@@ -16,7 +16,7 @@ class ModelGenerator(object):
     
     def generate(self, json_path: str, exp_dir: str, model_id: int):
         """
-        Return whether the model is generated successfully (0 success, -1 fail)
+        Return whether the model is generated successfully 
         """
         model_dir = Path(exp_dir) / 'models'
         pytorch_generation_fail = False
@@ -32,7 +32,7 @@ class ModelGenerator(object):
         if generate_status:  # Generation Fail
             self.__db_manager.update_model_generate_fail_backends(model_id, ['pytorch'])
     
-        return generate_status
+        return True if generate_status == 0 else False
 
     def __update_selected_layers_cnt(self, json_path):
         with open(json_path, 'r') as f:

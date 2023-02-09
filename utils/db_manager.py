@@ -105,11 +105,24 @@ class DbManager(object):
         cur.execute(GET_LOCALIZATION_MAP, (incons_id,))
         return cur.fetchall()
 
-    def add_training_incons(self, model_id, model_output_delta, loss_delta, loss_grads_delta):
-        INSERT_INCONS = '''insert into inconsistency(model_id, model_output_delta, loss_delta, loss_grads_delta)
-                           values(?, ?, ?, ?)
+    # def add_training_incons(self, model_id, model_output_delta, loss_delta, loss_grads_delta):
+    #     INSERT_INCONS = '''insert into inconsistency(model_id, model_output_delta, loss_delta, loss_grads_delta)
+    #                        values(?, ?, ?, ?)
+    #                     '''
+    #     self.__conn.execute(INSERT_INCONS, (model_id, model_output_delta, loss_delta, loss_grads_delta,))
+    #     self.__conn.commit()
+
+    #     FETCH_ROWID = '''select last_insert_rowid() from inconsistency'''
+    #     cur = self.__conn.cursor()
+    #     cur.execute(FETCH_ROWID)
+    #     return cur.fetchone()[0]
+
+
+    def add_training_incons(self, model_id, model_output_delta):
+        INSERT_INCONS = '''insert into inconsistency(model_id, model_output_delta)
+                           values(?, ?)
                         '''
-        self.__conn.execute(INSERT_INCONS, (model_id, model_output_delta, loss_delta, loss_grads_delta,))
+        self.__conn.execute(INSERT_INCONS, (model_id, model_output_delta,))
         self.__conn.commit()
 
         FETCH_ROWID = '''select last_insert_rowid() from inconsistency'''

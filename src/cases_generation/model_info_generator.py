@@ -12,30 +12,25 @@ import json
 class ModelInfoGenerator(object):
     def __init__(self, config: dict, generate_mode, db_manager, selector=None):
         super().__init__()
+        self.__node_num_range = config['node_num_range']
         self.__random = VariableGenerator(config['var'])
         self.__layer_generator = LayerInfoGenerator(self.__random, selector)
         self.__generate_mode = generate_mode
         self.__db_manager = db_manager
 
-    def generate(self, save_dir: str, node_num: Optional[int] = None):
+    def generate(self, save_dir: str):
         """
         Generate model information (Hong: Only support sequential for now)
+        Can specify number of node
 
         Return:
             json_path, input_shapes, model_id, exp_dir
         """
         # Randomly select number of nodes if not specified
-        # if node_num is None:
-        #     node_num = self.__random.randint_in_range(self.__node_num_range)
+        node_num = self.__random.randint_in_range(self.__node_num_range)           
 
         if self.__generate_mode == 'seq':
             model_info, input_shapes, output_shapes, node_num = self.generate_seq_model(node_num=node_num)
-        # elif self.__generate_mode == 'merging':
-        #     model_info, input_shapes, output_shapes, node_num = self.generate_merge_model(node_num=node_num)
-        # elif self.__generate_mode == 'dag':
-        #     model_info, input_shapes, output_shapes, node_num = self.generate_dag_model(node_num=node_num)
-        # elif self.__generate_mode == 'template':
-        #     model_info, input_shapes, output_shapes, node_num = self.generate_template_model(cell_num=self.__cell_num, node_num_per_normal_cell=self.__node_num_per_normal_cell, node_num_per_reduction_cell=self.__node_num_per_reduction_cell)
         else:
             raise ValueError(f"UnKnown generate mode '{self.__generate_mode}'")
 
@@ -107,9 +102,11 @@ class ModelInfoGenerator(object):
                 layer_type, layer_args, cur_shape = last_three_layers[i - (start_id + node_num - 3)](cur_shape)
 
             else:  # Middle layer
-                # Hong: If not specify layer type => Conv2D as defualt
+                # Hong: If not specify layer type => Conv2D as defualt  
                 layer_type, layer_args, cur_shape = self.__layer_generator.generate(cur_shape, last_layer=layer_type,
                                                                                     pool=pool, element=element)
+
+                #TODO Check whether the generated layer is valid, if not then regenerate                                                                     
                 if layer_type is None:  # This means there is no suitable layer
                     skip += 1
                     i += 1
