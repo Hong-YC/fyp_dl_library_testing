@@ -8,7 +8,7 @@ import onnxruntime
 import numpy as np
 import collections
 from utils.tool import *
-from utils.db_manager import *
+import utils.db_manager
 from src.cases_generation.torch_model import TorchModel
 
 pair={}
@@ -78,25 +78,29 @@ class comparator(object):
             return None
         
         comparable=True
-        if (True in np.isinf(O_torch)):
-            update_model_inf_backends(self.__model_id, ['torch'])
-            comparable=False
-        if (True in np.isnan(O_torch)):
-            update_model_nan_backends(self.__model_id, ['torch'])
-            comparable=False
-        if (True in np.isinf(O_onnx)):
-            update_model_inf_backends(self.__model_id, ['onnx'])
-            comparable=Falsev
-        if (True in np.isnan(O_onnx)):
-            update_model_nan_backends(self.__model_id, ['onnx'])
-            comparable=False
         
+        if (True in np.isinf(O_torch)):
+            self.__db_m.update_model_inf_backends(self.__model_id, ['torch'])
+            comparable=False
+            
+        if (True in np.isnan(O_torch)):
+            self.__db_m.update_model_nan_backends(self.__model_id, ['torch'])
+            comparable=False
+            
+        if (True in np.isinf(O_onnx)):
+            self.__db_m.update_model_inf_backends(self.__model_id, ['onnx'])
+            comparable=False
+            
+        if (True in np.isnan(O_onnx)):
+            self.__db_m.update_model_nan_backends(self.__model_id, ['onnx'])
+            comparable=False
+            
         if not comparable:
             return None
         
-        dif=norm_delta(O_torch, O_onnx)
+        dif=self.norm_delta(O_torch, O_onnx)
         if dif>epsilon:
-            add_inconsistencies([(self.__model_id,input,dif)])
+            self.__db_m.add_training_incons(self.__model_id, dif)
             
     def norm_delta(self, x, y, mode="max"):
         # infinite norm
