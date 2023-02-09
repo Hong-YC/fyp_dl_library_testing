@@ -32,7 +32,7 @@ if __name__ == '__main__':
         log_dir.mkdir(parents=True, exist_ok=True)
 
         with (log_dir / 'generation.log').open(mode='a', encoding='utf-8') as f:
-            f.write(f"[ERROR] Fail when generating model with pyTorch\n")
+            f.write(f"[ERROR] Fail when generating model with PyTorch\n")
             traceback.print_exc(file=f)
             f.write("\n\n")
 
