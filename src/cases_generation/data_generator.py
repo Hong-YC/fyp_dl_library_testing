@@ -10,9 +10,9 @@ class DataGenerator(object):
         self.__instance_num = config['instance_num']
         self.__ele_val_range = config['element_val_range']
 
-    def generate(self, input_shapes: dict, data_dir: str, output_shapes: Optional[dict] = None):
+    def generate(self, input_shapes: dict, exp_dir: str, output_shapes: Optional[dict] = None):
         # create save path
-        save_dir = Path(data_dir) / 'dataset'
+        save_dir = Path(exp_dir) / 'dataset'
 
         # Missing parent are created if needed, if the directory exists, do not throw an exception
         save_dir.mkdir(parents=True, exist_ok=True)

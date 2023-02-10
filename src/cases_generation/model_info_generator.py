@@ -102,7 +102,6 @@ class ModelInfoGenerator(object):
                 layer_type, layer_args, cur_shape = last_three_layers[i - (start_id + node_num - 3)](cur_shape)
 
             else:  # Middle layer
-                # Hong: If not specify layer type => Conv2D as defualt  
                 layer_type, layer_args, cur_shape = self.__layer_generator.generate(cur_shape, last_layer=layer_type,
                                                                                     pool=pool, element=element)
 

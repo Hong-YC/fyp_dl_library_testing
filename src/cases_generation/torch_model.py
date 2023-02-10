@@ -2,9 +2,36 @@ import torch.nn as nn
 import argparse
 import sys
 from .model_info_generator import ModelInfoGenerator
-from .generate_one import generate_layer
-from utils.utils import torch_layer
-from torchsummary import summary
+import json
+import numpy as np
+from pathlib import Path
+import warnings
+from functools import partial
+from utils.utils import get_layer_func, torch_layer
+
+warnings.filterwarnings("ignore")
+
+
+def generate_layer(layer_info: dict):
+    # generate layer from the layer info
+    layer_type, layer_args, pre_layers, output_shape = tuple(map(layer_info.get, ['type', 'args', 'pre_layers', 'output_shape']))
+    layer = get_layer_func(layer_type)
+
+    # Hong: we remove name temporarily
+    name = layer_args.pop('name', None)
+
+    # Hong: Layers from torch module require input, thus we use partial here
+    if layer_type in torch_layer:
+        layer_w_arg = partial(layer, **layer_args)
+    else:
+        layer_w_arg = layer(**layer_args)
+
+    if name is not None:
+        # Hong: add name back
+        layer_args['name'] = name
+
+    return layer_w_arg
+
 
 
 
@@ -55,37 +82,6 @@ class TorchModel(nn.Module):
 
         return result_dict
 
-
-# if __name__ == '__main__':
-#     # Obtain the parameters
-#     parse = argparse.ArgumentParser()
-#     parse.add_argument("--json_path", type=str)
-#     parse.add_argument("--output_dir", type=str)
-#     flags, _ = parse.parse_known_args(sys.argv[1:])
-
-#     try:
-#         with open(flags.json_path, 'r') as f:
-#             model_info = json.load(f)
-
-#         model = TorchModel(model_info)
-
-#         # Save the model
-#         model_path = Path(flags.output_dir) / f'torch.pt'
-#         torch.save(model.state_dict(), model_path)
-
-        
-#     except Exception:
-#         import traceback
-
-#         log_dir = Path(flags.output_dir).parent / 'logs'
-#         log_dir.mkdir(parents=True, exist_ok=True)
-
-#         with (log_dir / 'generation.log').open(mode='a', encoding='utf-8') as f:
-#             f.write(f"[ERROR] Fail when generating model with pyTorch\n")
-#             traceback.print_exc(file=f)
-#             f.write("\n\n")
-
-#         sys.exit(-1)
 
 if __name__ == '__main__':
     config = {

@@ -30,21 +30,19 @@ class TrainingDebugger(object):
 
     def run_generation(self):
         """
-        Generate pytorch model and data randomly
+        Generate models and data randomly
         """
         # Generate random Pytorch model
         print('Model generation start...')
         json_path, model_input_shapes, model_output_shapes, model_id, exp_dir = self.__model_info_generator.generate(save_dir=self.__output_dir)
-        torch_gen_status = self.__model_generator.generate(json_path=json_path,
+        ok_backends = self.__model_generator.generate(json_path=json_path,
                                                       exp_dir=exp_dir,
                                                       model_id=model_id)
-        if torch_gen_status:
-            # Convert to ONNX
-            
+        
 
         print(f'Model generation complete: model_id={model_id} ok_backends={ok_backends}')
 
-        if torch_gen_status:  
+        if len(ok_backends) >= 2:  
             print("Generate training data")
             self.__training_data_generator.generate(input_shapes=model_input_shapes,
                                                         output_shapes=model_output_shapes,
@@ -66,11 +64,6 @@ def main(testing_config):
                 'vocabulary_size': 1001,
             },
             'node_num_range': (5, 5),
-            'dag_io_num_range': (1, 3),
-            'dag_max_branch_num': 2,
-            'cell_num': 3,
-            'node_num_per_normal_cell': 10,
-            'node_num_per_reduction_cell': 2,
         },
         'training_data': {
             'instance_num': 10,
@@ -90,22 +83,28 @@ def main(testing_config):
     debugger = TrainingDebugger(config, USE_HEURISTIC, GENERATE_MODE, TIMEOUT)
     start_time = datetime.datetime.now()
 
+    model_id, exp_dir, ok_backends = debugger.run_generation()
 
-
-    for i in range(CASE_NUM):
-            print(f"######## Round {i} ########")
-            try:
-                print("------------- generation -------------")
-                model_id, exp_dir, ok_backends = debugger.run_generation()
-                # print("------------- detection -------------")
-                # ok_backends = debugger.run_detection(model_id, exp_dir, ok_backends)
-            except Exception:
-                import traceback
-                traceback.print_exc()
+    # for i in range(CASE_NUM):
+    #         print(f"######## Round {i} ########")
+    #         try:
+    #             print("------------- generation -------------")
+    #             model_id, exp_dir, ok_backends = debugger.run_generation()
+    #             # print("------------- detection -------------")
+    #             # ok_backends = debugger.run_detection(model_id, exp_dir, ok_backends)
+    #         except Exception:
+    #             import traceback
+    #             traceback.print_exc()
         
 
-    end_time = datetime.datetime.now()
-    time_delta = end_time - start_time
-    h, m, s = get_HH_mm_ss(time_delta)
-    print(f"Finish execution: Time used: {h} hour,{m} min,{s} sec")
+    # end_time = datetime.datetime.now()
+    # time_delta = end_time - start_time
+    # h, m, s = get_HH_mm_ss(time_delta)
+    # print(f"Finish execution: Time used: {h} hour,{m} min,{s} sec")
+
+if __name__ == '__main__':
+    import json
+    with open(str("testing_config.json"), "r") as f:
+        testing_config = json.load(f)
+    main(testing_config)
     
