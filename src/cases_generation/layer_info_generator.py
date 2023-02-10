@@ -2,6 +2,8 @@ from typing import Tuple, Optional
 from .output_shape_calculator import OutputShapeCalculator
 from .variable_generator import VariableGenerator
 import math,random
+from utils.utils import layer_types
+
 
 
 class LayerInfoGenerator(object):
@@ -11,8 +13,7 @@ class LayerInfoGenerator(object):
 
         from utils.utils import layer_types
         self.__layer_funcs = {name: getattr(self.layer_infos, name + '_layer') for name in layer_types}
-
-        # self.__selector = selector
+        self.__selector = selector
 
     def generate(self, input_shape: Tuple[Optional[int]], last_layer: Optional[str] = None, pool: Optional[list] = None, element: Optional[str] = None):
         """
@@ -25,15 +26,16 @@ class LayerInfoGenerator(object):
         input_dim = len(input_shape)
         # normal_pool = set(seq_layer_types+RNN_layer_types+activation_layer_types)
         # pool = list(set(pool) & normal_pool) if pool is not None else list(normal_pool)
-        # element = self.__selector.choose_element(pool=pool,
-        #                                          e1=last_layer,
-        #                                          input_dim=input_dim)
-        # if element is None:  # No suitable layer type
-        #     return None, None, input_shape
+        pool = list(set(layer_types))
+        element = self.__selector.choose_element(pool=pool,
+                                                 e1=last_layer,
+                                                 input_dim=input_dim)
+        if element is None:  # No suitable layer type
+            return None, None, input_shape
 
         # Hong: Temperal code
-        if element is None:
-            element = 'Softmax'
+        # if element is None:
+        #     element = 'Softmax'
         
         return self.__layer_funcs[element](input_shape=input_shape)
 
@@ -212,7 +214,7 @@ class LayerInfo(object):
             return_indices = self.__random.choice([True, False]),
             ceil_mode = self.__random.choice([True, False]),
         )
-        return 'Max_Pool1D', args, self.__output_shape.pool1D_layer(input_shape=input_shape, **args)
+        return 'MaxPool1d', args, self.__output_shape.pool1D_layer(input_shape=input_shape, **args)
 
     def Max_Pool2D_layer(self, input_shape: Tuple[Optional[int]]):
         '''只允许输入4D向量
@@ -231,7 +233,7 @@ class LayerInfo(object):
             # padding=self.__random.choice(["valid", "same"]),
             # data_format="channels_last" if is_channels_last else "channels_first",
         )
-        return 'Max_Pool2D', args, self.__output_shape.pool2D_layer(input_shape=input_shape,**args)
+        return 'MaxPool2d', args, self.__output_shape.pool2D_layer(input_shape=input_shape,**args)
 
     def Max_Pool3D_layer(self, input_shape: Tuple[Optional[int]]):
         '''只允许输入5D向量
@@ -250,7 +252,7 @@ class LayerInfo(object):
             # padding=self.__random.choice(["valid", "same"]),
             # data_format="channels_last" if is_channels_last else "channels_first",
         )
-        return 'Max_Pool3D', args, self.__output_shape.pool3D_layer(input_shape=input_shape,**args)
+        return 'MaxPool3d', args, self.__output_shape.pool3D_layer(input_shape=input_shape,**args)
 
     def AvgPool1d_layer(self, input_shape: Tuple[Optional[int]]):
         '''只允许输入3D向量

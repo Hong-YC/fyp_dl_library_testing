@@ -30,7 +30,10 @@ class ModelInfoGenerator(object):
         node_num = self.__random.randint_in_range(self.__node_num_range)           
 
         if self.__generate_mode == 'seq':
-            model_info, input_shapes, output_shapes, node_num = self.generate_seq_model(node_num=node_num)
+            # TODO: Use the following code instead for final version (Random sequence of layer w random output shape)
+            # model_info, input_shapes, output_shapes, node_num = self.generate_seq_model(node_num=node_num)
+            output_shape = self.__random.shape()
+            model_info, input_shapes, output_shapes, node_num = self.generate_seq_model(node_num=node_num, output_shape=output_shape)
         else:
             raise ValueError(f"UnKnown generate mode '{self.__generate_mode}'")
 

@@ -4,3 +4,4 @@
 !.gitignore
 !clear_data.py
 !create_db.sql
+!dummy.db
