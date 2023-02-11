@@ -27,15 +27,13 @@ class LayerInfoGenerator(object):
         # normal_pool = set(seq_layer_types+RNN_layer_types+activation_layer_types)
         # pool = list(set(pool) & normal_pool) if pool is not None else list(normal_pool)
         pool = list(set(layer_types))
-        element = self.__selector.choose_element(pool=pool,
-                                                 e1=last_layer,
-                                                 input_dim=input_dim)
+        # pool = list(set(['FractionalMaxPool2d', 'FractionalMaxPool3d', 'Conv1d', 'reshape']))
+        if self.__selector is not None:
+            element = self.__selector.choose_element(pool=pool,
+                                                    e1=last_layer,
+                                                    input_dim=input_dim)                                           
         if element is None:  # No suitable layer type
             return None, None, input_shape
-
-        # Hong: Temperal code
-        # if element is None:
-        #     element = 'Softmax'
         
         return self.__layer_funcs[element](input_shape=input_shape)
 
@@ -302,6 +300,7 @@ class LayerInfo(object):
             output_size = output_size,
             output_ratio = None if output_size else [random.uniform(0,1) for i in range(2)],
             # return_indices = self.__random.choice([True, False]),
+            return_indices = False,
         )
         return 'FractionalMaxPool2d', args, self.__output_shape.FractionalMaxPool2d_layer(input_shape=input_shape, **args)
 
@@ -316,6 +315,7 @@ class LayerInfo(object):
             output_size = output_size,
             output_ratio = None if output_size else [random.uniform(0,1) for i in range(3)],
             # return_indices = self.__random.choice([True, False]),
+            return_indices = False,
         )
         return 'FractionalMaxPool3d', args, self.__output_shape.FractionalMaxPool3d_layer(input_shape=input_shape, **args)
 

@@ -58,7 +58,7 @@ def main(testing_config):
         'model': {
             'var': {
                 'tensor_dimension_range': (2, 5),
-                'tensor_element_size_range': (2, 5),
+                'tensor_element_size_range': (5, 20),
                 'weight_value_range': (-10.0, 10.0),
                 'small_value_range': (0, 1),
                 'vocabulary_size': 1001,
@@ -83,24 +83,24 @@ def main(testing_config):
     debugger = TrainingDebugger(config, USE_HEURISTIC, GENERATE_MODE, TIMEOUT)
     start_time = datetime.datetime.now()
 
-    model_id, exp_dir, ok_backends = debugger.run_generation()
+    # model_id, exp_dir, ok_backends = debugger.run_generation()
 
-    # for i in range(CASE_NUM):
-    #         print(f"######## Round {i} ########")
-    #         try:
-    #             print("------------- generation -------------")
-    #             model_id, exp_dir, ok_backends = debugger.run_generation()
-    #             # print("------------- detection -------------")
-    #             # ok_backends = debugger.run_detection(model_id, exp_dir, ok_backends)
-    #         except Exception:
-    #             import traceback
-    #             traceback.print_exc()
+    for i in range(CASE_NUM):
+            print(f"######## Round {i} ########")
+            try:
+                print("------------- generation -------------")
+                model_id, exp_dir, ok_backends = debugger.run_generation()
+                # print("------------- detection -------------")
+                # ok_backends = debugger.run_detection(model_id, exp_dir, ok_backends)
+            except Exception:
+                import traceback
+                traceback.print_exc()
         
 
-    # end_time = datetime.datetime.now()
-    # time_delta = end_time - start_time
-    # h, m, s = get_HH_mm_ss(time_delta)
-    # print(f"Finish execution: Time used: {h} hour,{m} min,{s} sec")
+    end_time = datetime.datetime.now()
+    time_delta = end_time - start_time
+    h, m, s = get_HH_mm_ss(time_delta)
+    print(f"Finish execution: Time used: {h} hour,{m} min,{s} sec")
 
 if __name__ == '__main__':
     import json
