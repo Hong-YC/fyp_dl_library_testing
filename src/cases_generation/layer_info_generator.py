@@ -355,6 +355,40 @@ class LayerInfo(object):
         )
         return 'BatchNorm3d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape)
 
+    def LazyBatchNorm1d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入3D向量
+        '''
+        args = dict(
+            eps=self.__random.small_val(),
+            momentum=None if self.__random.boolean() else self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+            track_running_stats=self.__random.choice([True, False]),
+        )
+        return 'LazyBatchNorm1d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape)        
+
+    def LazyBatchNorm2d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入4D向量
+        '''
+        args = dict(
+            eps=self.__random.small_val(),
+            momentum=None if self.__random.boolean() else self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+            track_running_stats=self.__random.choice([True, False]),
+        )
+        return 'LazyBatchNorm2d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape) 
+
+    def LazyBatchNorm3d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入5D向量
+        '''
+        args = dict(
+            eps=self.__random.small_val(),
+            momentum=None if self.__random.boolean() else self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+            track_running_stats=self.__random.choice([True, False]),
+        )
+        return 'LazyBatchNorm3d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape) 
+
+
 if __name__ == '__main__':
     var_gen = VariableGenerator({'tensor_element_size_range': [10, 100], 'tensor_dimension_range': [2, 5]})
     lay_info_gen = LayerInfoGenerator(var_gen)

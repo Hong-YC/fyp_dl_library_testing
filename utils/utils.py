@@ -47,7 +47,10 @@ seq_layer_types = [
     'FractionalMaxPool3d',
     'BatchNorm1d',
     'BatchNorm2d',
-    'BatchNorm3d'
+    'BatchNorm3d',
+    'LazyBatchNorm1d',
+    'LazyBatchNorm2d',
+    'LazyBatchNorm3d'
 ]
 
 activation_layer_types = [
@@ -88,6 +91,9 @@ layer_conditions = {
     'BatchNorm1d': dim_3_cond,
     'BatchNorm2d':dim_4_cond,
     'BatchNorm3d':dim_5_cond,    
+    'LazyBatchNorm1d':dim_3_cond,
+    'LazyBatchNorm2d':dim_4_cond,
+    'LazyBatchNorm3d':dim_5_cond,
     # Since we skip the batch dim when flattening
     'Flatten': (lambda **kwargs: kwargs.get('input_dim', None) >= 3)
 
