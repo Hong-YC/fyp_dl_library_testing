@@ -4,6 +4,8 @@ from functools import partial, reduce
 from utils.utils import construct_layer_name
 from .variable_generator import VariableGenerator
 from .layer_info_generator import LayerInfoGenerator
+from .generate_layer import generate_layer
+
 
 
 import json
@@ -105,10 +107,22 @@ class ModelInfoGenerator(object):
                 layer_type, layer_args, cur_shape = last_three_layers[i - (start_id + node_num - 3)](cur_shape)
 
             else:  # Middle layer
-                layer_type, layer_args, cur_shape = self.__layer_generator.generate(cur_shape, last_layer=layer_type,
-                                                                                    pool=pool, element=element)
-
+                import torch
+                dummy_input = torch.randn((2, *cur_shape[1:]))
                 #TODO Check whether the generated layer is valid, if not then regenerate                                                                     
+                while True:
+                    try:
+                        layer_type, layer_args, cur_shape = self.__layer_generator.generate(cur_shape, last_layer=layer_type,pool=pool, element=element)
+                        layer_dict = dict(type=layer_type, args=dict(**layer_args, name="Dummy_name"))
+                        torch_layer = generate_layer(layer_dict)
+                        out = torch_layer(dummy_input)
+                        break
+                    except:
+                        import traceback
+                        print("[ERROR] Fail to generate layer")
+                        traceback.print_exc()       
+                                                                        
+
                 if layer_type is None:  # This means there is no suitable layer
                     skip += 1
                     i += 1
