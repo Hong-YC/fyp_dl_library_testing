@@ -37,14 +37,17 @@ seq_layer_types = [
     'Conv2d',
     'Conv3d',
     'Flatten',
-    'Max_Pool1D',
-    'Max_Pool2D',
-    'Max_Pool3D',
+    'MaxPool1d',
+    'MaxPool2d',
+    'MaxPool3d',
     'AvgPool1d',
     'AvgPool2d',
     'AvgPool3d',
     'FractionalMaxPool2d',
-    'FractionalMaxPool3d'
+    'FractionalMaxPool3d',
+    'BatchNorm1d',
+    'BatchNorm2d',
+    'BatchNorm3d'
 ]
 
 activation_layer_types = [
@@ -74,14 +77,17 @@ layer_conditions = {
     'Conv1d': dim_3_cond,
     'Conv2d': dim_4_cond,
     'Conv3d': dim_5_cond,
-    'Max_Pool1D': dim_3_cond,
-    'Max_Pool2D': dim_4_cond,
-    'Max_Pool3D': dim_5_cond,
+    'MaxPool1d': dim_3_cond,
+    'MaxPool2d': dim_4_cond,
+    'MaxPool3d': dim_5_cond,
     'AvgPool1d': dim_3_cond,
     'AvgPool2d': dim_4_cond,
     'AvgPool3d': dim_5_cond,
     'FractionalMaxPool2d': dim_4_cond,
     'FractionalMaxPool3d': dim_5_cond,
+    'BatchNorm1d': dim_3_cond,
+    'BatchNorm2d':dim_4_cond,
+    'BatchNorm3d':dim_5_cond,    
     # Since we skip the batch dim when flattening
     'Flatten': (lambda **kwargs: kwargs.get('input_dim', None) >= 3)
 

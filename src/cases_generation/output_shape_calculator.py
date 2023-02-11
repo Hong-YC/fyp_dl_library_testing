@@ -84,4 +84,7 @@ class OutputShapeCalculator(object):
     
     def FractionalMaxPool3d_layer(self, input_shape, kernel_size, output_size, output_ratio, return_indices):
         T_out, H_out, W_out = output_size if output_size else [math.floor(input_shape[2+i] * output_ratio[i]) for i in range(3)]
-        return (*input_shape[:-3],T_out,H_out,W_out)    
+        return (*input_shape[:-3],T_out,H_out,W_out) 
+
+    def BatchNorm_layer(self, input_shape):
+        return input_shape
