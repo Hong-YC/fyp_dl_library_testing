@@ -10,41 +10,46 @@ from pathlib import Path
 from torchsummary import summary
 
 if __name__ == '__main__':
-    config = {
-        'var': {
-            'tensor_dimension_range': (5,5),
-            'tensor_element_size_range': (2, 64),
-            'weight_value_range' : (5,6),
-            'small_value_range' : (1,3)
-        },
-        'node_num_range': (5, 5),
-    }
+    # config = {
+    #     'var': {
+    #         'tensor_dimension_range': (5,5),
+    #         'tensor_element_size_range': (2, 64),
+    #         'weight_value_range' : (5,6),
+    #         'small_value_range' : (1,3)
+    #     },
+    #     'node_num_range': (5, 5),
+    # }
 
-    db_manager = DbManager(str(Path.cwd() / 'data' / 'dummy.db'))
+    # db_manager = DbManager(str(Path.cwd() / 'data' / 'dummy.db'))
 
-    m_info_generator = ModelInfoGenerator(config, 'seq', db_manager)
+    # m_info_generator = ModelInfoGenerator(config, 'seq', db_manager)
 
-    m_info = m_info_generator.generate_seq_model(5, output_shape=(None, 3, 4), element = "FractionalMaxPool3d")
+    # m_info = m_info_generator.generate_seq_model(5, output_shape=(None, 3, 4), element = "FractionalMaxPool3d")
 
-    # print('?????????????',m_info)
-    with open(str(Path.cwd() / 'models/dummy_model.json'), 'w') as f:
-        json.dump(m_info[0], f)
+    # with open(str(Path.cwd() / 'models/dummy_model.json'), 'w') as f:
+    #     json.dump(m_info[0], f)
 
+    model_info_path = './data/dummy_output/000009/models/model.json'
     
+    with open(model_info_path, 'r') as f:
+        m_info = json.load(f)
+
+
     device = "cpu"
     if torch.cuda.is_available():
         device = "cuda:0"
     
-    model = TorchModel(m_info[0])
+    model = TorchModel(m_info)
     print(model)
-    # input_shape = m_info[1]["00_input_object"]
-  
 
+    input_shape = m_info["model_structure"]["0"]["args"]["shape"]
+    print(input_shape)
+  
     # input_shape = input_shape[1:]
     # print("Input shape: ", input_shape)
 
-    # model.to(device)
-    # summary(model, input_shape)
+    model.to(device)
+    summary(model, input_size=input_shape)
 
     # ======================================================================
     # input_shape = (1,) + input_shape
