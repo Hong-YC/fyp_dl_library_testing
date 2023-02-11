@@ -50,7 +50,8 @@ seq_layer_types = [
     'BatchNorm3d',
     'LazyBatchNorm1d',
     'LazyBatchNorm2d',
-    'LazyBatchNorm3d'
+    'LazyBatchNorm3d',
+    'GroupNorm'
 ]
 
 activation_layer_types = [

@@ -388,6 +388,19 @@ class LayerInfo(object):
         )
         return 'LazyBatchNorm3d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape) 
 
+    def GroupNorm_layer(self, input_shape: Tuple[Optional[int]]):
+        ''' 
+        Input: (N,C,*), where C= num_channels
+        Output: (N,C,*), same shape as input
+        '''
+        args = dict(
+            num_groups = self.__random.choice(self.__random.getFactor(input_shape[1])),
+            num_channels = input_shape[1],
+            eps=self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+        )
+        return 'GroupNorm', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape) 
+
 
 if __name__ == '__main__':
     var_gen = VariableGenerator({'tensor_element_size_range': [10, 100], 'tensor_dimension_range': [2, 5]})
