@@ -27,11 +27,11 @@ class LayerInfoGenerator(object):
         # normal_pool = set(seq_layer_types+RNN_layer_types+activation_layer_types)
         # pool = list(set(pool) & normal_pool) if pool is not None else list(normal_pool)
         pool = list(set(layer_types))
-
+        pool = list(set(['FractionalMaxPool2d', 'FractionalMaxPool3d', 'Conv1d', 'reshape']))
         if self.__selector is not None:
             element = self.__selector.choose_element(pool=pool,
                                                     e1=last_layer,
-                                                    input_dim=input_dim)
+                                                    input_dim=input_dim)                                           
         if element is None:  # No suitable layer type
             return None, None, input_shape
         

@@ -112,12 +112,12 @@ class ModelInfoGenerator(object):
                 #TODO Check whether the generated layer is valid, if not then regenerate                                                                     
                 while True:
                     try:
-                        layer_type, layer_args, cur_shape = self.__layer_generator.generate(cur_shape, last_layer=layer_type,pool=pool, element=element)
+                        layer_type, layer_args, cur_shape = self.__layer_generator.generate(cur_shape, last_layer=layer_type, pool=pool, element=element)
                         layer_dict = dict(type=layer_type, args=dict(**layer_args, name="Dummy_name"))
                         torch_layer = generate_layer(layer_dict)
-                        out = torch_layer(dummy_input)
+                        out = torch_layer(dummy_input)                        
                         break
-                    except:
+                    except Exception:
                         import traceback
                         print("[ERROR] Fail to generate layer")
                         traceback.print_exc()       
