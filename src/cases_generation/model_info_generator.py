@@ -134,7 +134,7 @@ class ModelInfoGenerator(object):
 
             # Raise error if the generated shape is too big
             if self.__shape_too_big(cur_shape):
-                raise ValueError("Shape too big!!")
+                raise ValueError("Shape too big or is zero!!")
 
             model_structure[str(j)] = dict(type=layer_type,
                                            args=dict(**layer_args, name=layer_name),
