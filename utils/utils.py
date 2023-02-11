@@ -83,7 +83,7 @@ layer_conditions = {
     'FractionalMaxPool2d': dim_4_cond,
     'FractionalMaxPool3d': dim_5_cond,
     # Since we skip the batch dim when flattening
-    'Flatten': (lambda **kwargs: kwargs.get('input_dim', None) >= 3),
+    'Flatten': (lambda **kwargs: kwargs.get('input_dim', None) >= 3)
 
 }
 
