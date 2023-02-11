@@ -200,7 +200,7 @@ class LayerInfo(object):
         )
         return 'thresholded_ReLU', args, self.__output_shape.activation_layer(input_shape)
 
-    def Max_Pool1D_layer(self, input_shape: Tuple[Optional[int]]):
+    def MaxPool1d_layer(self, input_shape: Tuple[Optional[int]]):
         '''只允许输入3D向量
         '''
         kernel_size = self.__random.kernel_size(input_shape[2:])[0]
@@ -209,12 +209,12 @@ class LayerInfo(object):
             stride = self.__random.sizes_with_limitation(input_shape[2:])[0] ,
             padding = self.__random.sizes_with_limitation_zero([kernel_size//2])[0],
             dilation = self.__random.sizes_with_limitation([input_shape[2]//kernel_size])[0],
-            return_indices = self.__random.choice([True, False]),
+            # return_indices = self.__random.choice([True, False]),
             ceil_mode = self.__random.choice([True, False]),
         )
         return 'MaxPool1d', args, self.__output_shape.pool1D_layer(input_shape=input_shape, **args)
 
-    def Max_Pool2D_layer(self, input_shape: Tuple[Optional[int]]):
+    def MaxPool2d_layer(self, input_shape: Tuple[Optional[int]]):
         '''只允许输入4D向量
         '''
         window_limitation = input_shape[2:] # (H,W)
@@ -224,16 +224,12 @@ class LayerInfo(object):
             stride = self.__random.sizes_with_limitation(window_limitation) if self.__random.boolean() else kernel_size,
             padding = self.__random.sizes_with_limitation_zero([i//2 for i in kernel_size]),
             dilation = self.__random.sizes_with_limitation([window_limitation[i]//kernel_size[i] for i in range(2)]),
-            return_indices = self.__random.choice([True, False]),
+            # return_indices = self.__random.choice([True, False]),
             ceil_mode = self.__random.choice([True, False]),
-            # pool_size=self.__random.kernel_size(window_limitation),
-            # strides=self.__random.sizes_with_limitation(window_limitation) if self.__random.boolean() else None,
-            # padding=self.__random.choice(["valid", "same"]),
-            # data_format="channels_last" if is_channels_last else "channels_first",
         )
         return 'MaxPool2d', args, self.__output_shape.pool2D_layer(input_shape=input_shape,**args)
 
-    def Max_Pool3D_layer(self, input_shape: Tuple[Optional[int]]):
+    def MaxPool3d_layer(self, input_shape: Tuple[Optional[int]]):
         '''只允许输入5D向量
         '''
         window_limitation = input_shape[2:] # (D,H,W)
@@ -243,12 +239,8 @@ class LayerInfo(object):
             stride = self.__random.sizes_with_limitation(window_limitation) if self.__random.boolean() else kernel_size,
             padding = self.__random.sizes_with_limitation_zero([i//2 for i in kernel_size]),
             dilation = self.__random.sizes_with_limitation([window_limitation[i]//kernel_size[i] for i in range(3)]),
-            return_indices = self.__random.choice([True, False]),
+            # return_indices = self.__random.choice([True, False]),
             ceil_mode = self.__random.choice([True, False]),
-            # pool_size=self.__random.kernel_size(window_limitation),
-            # strides=self.__random.sizes_with_limitation(window_limitation) if self.__random.boolean() else None,
-            # padding=self.__random.choice(["valid", "same"]),
-            # data_format="channels_last" if is_channels_last else "channels_first",
         )
         return 'MaxPool3d', args, self.__output_shape.pool3D_layer(input_shape=input_shape,**args)
 
@@ -307,7 +299,7 @@ class LayerInfo(object):
             kernel_size = kernel_size,
             output_size = output_size,
             output_ratio = None if output_size else [random.uniform(0,1) for i in range(2)],
-            return_indices = self.__random.choice([True, False]),
+            # return_indices = self.__random.choice([True, False]),
         )
         return 'FractionalMaxPool2d', args, self.__output_shape.FractionalMaxPool2d_layer(input_shape=input_shape, **args)
 
@@ -321,9 +313,78 @@ class LayerInfo(object):
             kernel_size = kernel_size,
             output_size = output_size,
             output_ratio = None if output_size else [random.uniform(0,1) for i in range(3)],
-            return_indices = self.__random.choice([True, False]),
+            # return_indices = self.__random.choice([True, False]),
         )
         return 'FractionalMaxPool3d', args, self.__output_shape.FractionalMaxPool3d_layer(input_shape=input_shape, **args)
+
+    def BatchNorm1d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入3D向量
+        '''
+        args = dict(
+            num_features = input_shape[-2],
+            eps=self.__random.small_val(),
+            momentum=None if self.__random.boolean() else self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+            track_running_stats=self.__random.choice([True, False]),
+        )
+        return 'BatchNorm1d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape)
+
+    def BatchNorm2d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入4D向量
+        '''
+        args = dict(
+            num_features = input_shape[-3],
+            eps=self.__random.small_val(),
+            momentum=None if self.__random.boolean() else self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+            track_running_stats=self.__random.choice([True, False]),
+        )
+        return 'BatchNorm2d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape)
+
+    def BatchNorm3d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入5D向量
+        '''
+        args = dict(
+            num_features = input_shape[-4],
+            eps=self.__random.small_val(),
+            momentum=None if self.__random.boolean() else self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+            track_running_stats=self.__random.choice([True, False]),
+        )
+        return 'BatchNorm3d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape)
+
+    def LazyBatchNorm1d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入3D向量
+        '''
+        args = dict(
+            eps=self.__random.small_val(),
+            momentum=None if self.__random.boolean() else self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+            track_running_stats=self.__random.choice([True, False]),
+        )
+        return 'LazyBatchNorm1d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape)        
+
+    def LazyBatchNorm2d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入4D向量
+        '''
+        args = dict(
+            eps=self.__random.small_val(),
+            momentum=None if self.__random.boolean() else self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+            track_running_stats=self.__random.choice([True, False]),
+        )
+        return 'LazyBatchNorm2d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape) 
+
+    def LazyBatchNorm3d_layer(self, input_shape: Tuple[Optional[int]]):
+        '''只允许输入5D向量
+        '''
+        args = dict(
+            eps=self.__random.small_val(),
+            momentum=None if self.__random.boolean() else self.__random.small_val(),
+            affine=self.__random.choice([True, False]),
+            track_running_stats=self.__random.choice([True, False]),
+        )
+        return 'LazyBatchNorm3d', args, self.__output_shape.BatchNorm_layer(input_shape=input_shape) 
 
 
 if __name__ == '__main__':
