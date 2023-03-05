@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # with open(str(Path.cwd() / 'models/dummy_model.json'), 'w') as f:
     #     json.dump(m_info[0], f)
 
-    model_info_path = './data/dummy_output/000009/models/model.json'
+    model_info_path = './data/dummy_output/000006/models/model.json'
     
     with open(model_info_path, 'r') as f:
         m_info = json.load(f)
@@ -45,11 +45,11 @@ if __name__ == '__main__':
     input_shape = m_info["model_structure"]["0"]["args"]["shape"]
     print(input_shape)
   
-    # input_shape = input_shape[1:]
+    input_shape = input_shape[1:]
     # print("Input shape: ", input_shape)
 
     model.to(device)
-    summary(model, input_size=input_shape)
+    summary(model, input_size=tuple(input_shape))
 
     # ======================================================================
     # input_shape = (1,) + input_shape
