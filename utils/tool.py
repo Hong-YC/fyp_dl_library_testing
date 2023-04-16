@@ -89,6 +89,7 @@ def extract_inter_output_onnx(model,input):
 # if tensorflow/ort inference output is different from others, extract tf model's intermediate output (output format is numpy array)
 # the input model is PyTorch json file, input is a numpy array
 # only call this function when differing in final prediction
+# output is a dictionary with two keys: "onnx_output" and "tf_output"
 def extract_inter_output(pytorch_json_path, input):
     output = {}
     onnx_output_list = []
