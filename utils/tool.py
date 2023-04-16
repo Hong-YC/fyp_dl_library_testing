@@ -89,7 +89,9 @@ def extract_inter_output_onnx(model,input):
 # if tensorflow inference output is different from others, extract tf model's intermediate output (output format is numpy array)
 # the input model is PyTorch json file, input is a numpy array
 def extract_inter_output_tensorflow(pytorch_json_path, input):
-    output_list = []
+    output = {}
+    onnx_output_list = []
+    tf_output_list = []
     device = "cpu"
     if torch.cuda.is_available():
         device = "cuda:0"
@@ -118,6 +120,8 @@ def extract_inter_output_tensorflow(pytorch_json_path, input):
             opset_version=11,  # version can be >=7 <=16
             # We define axes as dynamic to allow batch_size > 1
         )
+        //output onnx inference
+        onnx_output_list.append(ort_inference(model_onnx_path,input))
 
         # conver the ONNX model into tensorflowRep
         onnx_model = onnx.load("model.onnx")
@@ -126,7 +130,9 @@ def extract_inter_output_tensorflow(pytorch_json_path, input):
         # tf_rep.export_graph("output/model.pb")
         tf_input = tf.convert_to_tensor(input, dtype = tf.float32)
         tf_output = tf_rep.run(tf_input)
-        output_list.append(np.array(tf_output))
-    return output_list
+        tf_output_list.append(np.array(tf_output))
+    output['onnx_output'] = onnx_output_list
+    output['tf_output'] = tf_output_list
+    return output
 
         
