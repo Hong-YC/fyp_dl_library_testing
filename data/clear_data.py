@@ -34,8 +34,9 @@ if db_path.exists():
                     '''
     CREATE_INCONS = '''CREATE TABLE "inconsistency" (
                         "model_id"	INTEGER NOT NULL,
+                        "backend_pair"	TEXT NOT NULL,
                         "model_output_delta"	REAL,
-                        PRIMARY KEY("model_id")
+                        PRIMARY KEY("model_id","backend_pair")
                     )'''
     CREATE_MAP = '''CREATE TABLE "localization_map" (
                     "incons_id"	INTEGER NOT NULL,

@@ -65,6 +65,30 @@ def __get_onnx_output(model_dir: str, model_info_path: str, training_instances_p
     save_output(O_onnx, output_dir)
 
 
+def __get_tensorflow_output(model_dir: str, model_info_path: str, training_instances_path: str, output_dir: str):
+    from onnx_tf.backend import prepare
+    import tensorflow as tf
+    import onnx
+    #prepare onnx model
+    onnx_model_path = str(Path(model_dir) / 'model.onnx')
+    onnx_model = onnx.load(onnx_model_path)
+    tf_model = prepare(onnx_model)
+
+    #prepare input
+    training_inputs = [*np.load(training_instances_path).values()]
+    # training_input = np.float32(training_inputs[0])
+    training_input = tf.convert_to_tensor(training_inputs[0], dtype = tf.float32)
+
+    # Run inference
+    result = tf_model.run(training_input)
+    O_tensorflow = result[0]
+    # print(O_tensorflow)
+
+    # Save the output
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    save_output(O_tensorflow, output_dir)
+
+
 if __name__ == "__main__":
     # obtain parameters
     parse = argparse.ArgumentParser()
@@ -80,8 +104,8 @@ if __name__ == "__main__":
             __get_pytorch_output(flags.model_dir, flags.model_info_path, flags.training_instances_path, flags.outputs_dir)
         elif flags.backend == "onnx":
             __get_onnx_output(flags.model_dir, flags.model_info_path, flags.training_instances_path, flags.outputs_dir)
-        # elif flags.backend == "tensorflow":
-        #     __get_tensorflow_output()
+        elif flags.backend == "tensorflow":
+            __get_tensorflow_output(flags.model_dir, flags.model_info_path, flags.training_instances_path, flags.outputs_dir)
 
     except Exception:
         import traceback

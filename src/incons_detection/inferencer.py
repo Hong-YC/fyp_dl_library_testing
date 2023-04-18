@@ -1,5 +1,7 @@
 from utils.cmd_process import CmdProcess
-
+from typing import List, Optional
+import numpy as np
+from pathlib import Path
 
 class Inferencer(object):
 
@@ -11,8 +13,6 @@ class Inferencer(object):
     def inference(self, model_id: int, exp_dir: str, ok_backends: List[str]):
         """
         Run inference on each ok_backend
-
-        Return: ????
         """
         model_dir = Path(exp_dir) / 'models'
         training_inputs_path = Path(exp_dir) / 'dataset' / 'inputs.npz'
@@ -45,7 +45,7 @@ class Inferencer(object):
                 crash_backends.append(bk)
 
             else:
-                output_data = {fn.stem: np.load(str(fn)) for fn in (outputs_dir / bk).glob("*.npy")}
+                output_data = np.load(str(outputs_dir / bk/'output.npy'))
                 backends_output[bk] = output_data
 
                 if self.__check(output_data, np.isnan):  # If output nan
@@ -64,10 +64,10 @@ class Inferencer(object):
 
         return status, backends_output, [bk for bk in ok_backends if bk not in crash_backends]
 
-    def __check(self, weights, f):
-        for w in weights.values():
-            if f(w).any():
-                return True
+    def __check(self, w, f):
+        if f(w).any():
+            return True
+        
         return False
 
 
