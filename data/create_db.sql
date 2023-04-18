@@ -7,16 +7,11 @@ CREATE TABLE IF NOT EXISTS "model" (
                         "crash_backends"	TEXT,
                         "nan_backends"	TEXT,
                         "inf_backends"	TEXT,
-                        "loss_func"	TEXT,
-                        "optimizer"	TEXT,
                         "status"	TEXT
                     );
 CREATE TABLE IF NOT EXISTS "inconsistency" (
                         "model_id"	INTEGER NOT NULL,
                         "model_output_delta"	REAL,
-                        "loss_delta"	REAL,
-                        "loss_grads_delta"	REAL,
-                        "weights_delta"	REAL,
                         PRIMARY KEY("model_id")
                     );
 CREATE TABLE IF NOT EXISTS "localization_map" (

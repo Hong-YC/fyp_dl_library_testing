@@ -29,17 +29,12 @@ if db_path.exists():
                         "crash_backends"	TEXT,
                         "nan_backends"	TEXT,
                         "inf_backends"	TEXT,
-                        "loss_func"	TEXT,
-                        "optimizer"	TEXT,
                         "status"	TEXT
                     )
                     '''
     CREATE_INCONS = '''CREATE TABLE "inconsistency" (
                         "model_id"	INTEGER NOT NULL,
                         "model_output_delta"	REAL,
-                        "loss_delta"	REAL,
-                        "loss_grads_delta"	REAL,
-                        "weights_delta"	REAL,
                         PRIMARY KEY("model_id")
                     )'''
     CREATE_MAP = '''CREATE TABLE "localization_map" (

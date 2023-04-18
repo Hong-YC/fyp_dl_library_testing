@@ -90,7 +90,7 @@ def extract_inter_output_onnx(model,input):
 # the input model is PyTorch json file, input is a numpy array
 # only call this function when differing in final prediction
 # output is a dictionary with two keys: "onnx_output" and "tf_output"
-def extract_inter_output(pytorch_json_path, input):
+def extract_inter_output_tensorflow(pytorch_json_path, input):
     output = {}
     onnx_output_list = []
     tf_output_list = []
@@ -122,7 +122,7 @@ def extract_inter_output(pytorch_json_path, input):
             opset_version=11,  # version can be >=7 <=16
             # We define axes as dynamic to allow batch_size > 1
         )
-        //output onnx inference
+        # output onnx inference
         onnx_output_list.append(ort_inference(model_onnx_path,input))
 
         # conver the ONNX model into tensorflowRep
