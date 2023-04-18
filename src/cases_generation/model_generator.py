@@ -52,7 +52,7 @@ class ModelGenerator(object):
             self.__update_selected_layers_cnt(str(json_path)) 
 
         # Both pytorch and onnx success
-        return ["pytorch", "onnx"]
+        return ["pytorch", "onnx", "tensorflow"]
 
     def __update_selected_layers_cnt(self, json_path):
         with open(json_path, 'r') as f:
