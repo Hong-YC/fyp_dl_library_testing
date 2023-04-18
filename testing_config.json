@@ -1,7 +1,7 @@
 {
     "debug_mode": 1,
     "dataset_name": "dummy",
-    "case_num": 30,
+    "case_num": 10,
     "generate_mode": "seq",
     "data_dir": "data",
     "timeout": 300,

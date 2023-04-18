@@ -40,7 +40,7 @@ class TrainingDebugger(object):
                                                       model_id=model_id)
         
 
-        print(f'Model generation complete: model_id={model_id} ok_backends={ok_backends}')
+        print(f'Model generation complete: model_id={model_id} generation_ok_backends={ok_backends}')
 
         if len(ok_backends) >= 2:  
             print("Generate training data")
@@ -51,6 +51,38 @@ class TrainingDebugger(object):
         
 
         return model_id, exp_dir, ok_backends
+    
+    # def run_detection(self, model_id: int, exp_dir: str, ok_backends: List[str],  loss: Optional[str] = None, optimizer: Optional[str] = None):
+    #     """
+    #     Run differential testing on a model
+    #     """
+        
+    #     if len(ok_backends) >= 2:
+    #         # Inference Stage
+    #         print('Start Inference...')
+    #         status, backends_outputs, backends_losses, backends_loss_grads, backends_grads, ok_backends = self.__weights_trainer.train(model_id=model_id,
+    #                                                                                                                                    exp_dir=exp_dir,
+    #                                                                                                                                    ok_backends=ok_backends,
+    #                                                                                                                                    loss=loss,
+    #                                                                                                                                    optimizer=optimizer)
+    #         print(f'Inference end: ok_backends={ok_backends}')
+
+    #         self.__db_manager.record_status(model_id, status)
+
+    #     if len(ok_backends) >= 2:
+    #         # Weights Comparator阶段
+    #         print('Compare开始...')
+    #         self.__weights_comparator.compare(model_id=model_id,
+    #                                           exp_dir=exp_dir,
+    #                                           backends_outputs=backends_outputs,
+    #                                           backends_losses=backends_losses,
+    #                                           backends_loss_grads=backends_loss_grads,
+    #                                           backends_grads=backends_grads,
+    #                                           # backends_weights=backends_weights,
+    #                                           ok_backends=ok_backends)
+    #         print('Compare结束.')
+
+    #     return ok_backends
 
 
 def main(testing_config):
@@ -66,7 +98,7 @@ def main(testing_config):
             'node_num_range': (5, 5),
         },
         'training_data': {
-            'instance_num': 10,
+            'instance_num': 1,
             'element_val_range': (0, 100),
         },
         'db_path': str(Path.cwd() / testing_config['data_dir'] / f'{testing_config["dataset_name"]}.db'),

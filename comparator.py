@@ -11,14 +11,14 @@ from utils.tool import *
 import utils.db_manager
 from src.cases_generation.torch_model import TorchModel
 
-pair={}
-pair['Conv2d']='Conv'
-pair['ReLU']='Relu'
-pair['Linear']='Gemm'
-pair['Softmax']='Softmax'
-pair['Flatten']='Flatten'
-pair['reshape']='Reshape'
-pair['LeakyReLU']='LeakyRelu'
+# pair={}
+# pair['Conv2d']='Conv'
+# pair['ReLU']='Relu'
+# pair['Linear']='Gemm'
+# pair['Softmax']='Softmax'
+# pair['Flatten']='Flatten'
+# pair['reshape']='Reshape'
+# pair['LeakyReLU']='LeakyRelu'
 
 class comparator(object):
 
@@ -41,7 +41,7 @@ class comparator(object):
         
     def extract(self, input):
         #extract outputs
-        self.__output_torch=extract_inter_output_pytorch(self.__model_torch,input)
+        self.__output_torch=extract_inter_output_pytorch(self.__model_torch, input)
         self.__name_list=list(self.__output_torch.keys())
             
         outs=extract_inter_output_onnx(self.__model_onnx,input.numpy())
