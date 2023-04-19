@@ -111,7 +111,6 @@ def main(testing_config):
     debugger = TrainingDebugger(config, USE_HEURISTIC, GENERATE_MODE, TIMEOUT)
     start_time = datetime.datetime.now()
 
-    # model_id, exp_dir, ok_backends = debugger.run_generation()
 
     for i in range(CASE_NUM):
             print(f"######## Round {i} ########")
