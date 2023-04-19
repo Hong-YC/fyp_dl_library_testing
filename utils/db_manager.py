@@ -87,13 +87,13 @@ class DbManager(object):
         cur.execute(SELECT_INCONS_INPUTS_AND_BKS_BY_MODEL_ID, (model_id, threshlod))
         return [res[0] for res in cur.fetchall()]
 
-    def get_huge_incons(self, threshold: float, model_id: int):
-        GET_HUGE_INCONS = '''select rowid, input_index
+    def get_huge_incons(self, threshold: float):
+        GET_HUGE_INCONS = '''select model_id, backend_pair
                              from inconsistency
-                             where model_id = ? and (output_distance > ? or output_distance is null)
+                             where model_output_delta > ?
                           '''
         cur = self.__conn.cursor()
-        cur.execute(GET_HUGE_INCONS, (model_id, threshold,))
+        cur.execute(GET_HUGE_INCONS, (threshold,))
         return cur.fetchall()
     
     def get_localization_map(self, incons_id):
