@@ -20,7 +20,7 @@ def to_numpy(tensor: torch.Tensor):
 
 # differential testing
 # at this stage assume tensor1 and tensor2 are both numpy array
-def diff_test(tensor1,tensor2,thres = 10e-1,norm = "L2"):
+def diff_test(tensor1,tensor2,thres = 10e-1,norm = "Linf"):
     if norm == "L2":
         return np.sum((tensor1-tensor2)**2) <= thres
     if norm == "L1":
@@ -38,9 +38,12 @@ def extract_ort_weight(model):
     return [numpy_helper.to_array(weights[i]) for i in range(len(weights))]
 
 
-def ort_inference(onnx_path, input):
+def ort_inference(onnx_path, input,input_is_numpy = True):
     ort_session = onnxruntime.InferenceSession(onnx_path)
-    ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input)}
+    if not input_is_numpy:
+        ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input)}
+    else:
+        ort_inputs = {ort_session.get_inputs()[0].name: input}
     ort_outputs = ort_session.run(None, ort_inputs)
     return ort_outputs
 
@@ -54,6 +57,7 @@ def tf_inference(onnx_model, np_arr):
 
 # extract intermediate outputs of each layers of PyTorch models
 def extract_inter_output_pytorch(model,input):
+    
     # a helper function of forward hook in PyTorch
     def get_activation_py(name):
         def hook(model, input, output):
@@ -89,9 +93,10 @@ def extract_inter_output_onnx(model,input):
 # if tensorflow/ort inference output is different from others, extract tf model's intermediate output (output format is numpy array)
 # the input model is PyTorch json file, input is a numpy array
 # only call this function when differing in final prediction
-# output is a dictionary with two keys: "onnx_output" and "tf_output"
+# output is a dictionary with three keys: "pytorch_output", "onnx_output" and "tf_output"
 def extract_inter_output(pytorch_json_path, input):
     output = {}
+    pytorch_output_list = []
     onnx_output_list = []
     tf_output_list = []
     device = "cpu"
@@ -100,6 +105,8 @@ def extract_inter_output(pytorch_json_path, input):
     with open(pytorch_json_path, 'r') as f:
         m_info = json.load(f)
     dic = m_info["model_structure"]
+
+    py_input = torch.from_numpy(input).float().to(device)
 
     for key in dic:
         if key == '0':
@@ -111,6 +118,11 @@ def extract_inter_output(pytorch_json_path, input):
         temp_info['output_id_list'] = list(key)
         py_model = TorchModel(temp_info)
         py_model = py_model.to(device)
+        # output pytorch inference
+        py_output = py_model(py_input)
+        py_output  =next(iter(py_output.values()))
+        pytorch_output_list.append(to_numpy(py_output))
+
 
         # convert the PyTorch model into ONNX
         input_shape = input.shape
@@ -122,8 +134,9 @@ def extract_inter_output(pytorch_json_path, input):
             opset_version=11,  # version can be >=7 <=16
             # We define axes as dynamic to allow batch_size > 1
         )
-        //output onnx inference
-        onnx_output_list.append(ort_inference(model_onnx_path,input))
+        # output onnx inference
+        onnx_input = input.astype(np.float32)
+        onnx_output_list.append(ort_inference(model_onnx_path,onnx_input)[0])
 
         # conver the ONNX model into tensorflowRep
         onnx_model = onnx.load("model.onnx")
@@ -132,9 +145,29 @@ def extract_inter_output(pytorch_json_path, input):
         # tf_rep.export_graph("output/model.pb")
         tf_input = tf.convert_to_tensor(input, dtype = tf.float32)
         tf_output = tf_rep.run(tf_input)
-        tf_output_list.append(np.array(tf_output))
+        tf_output_list.append(np.array(tf_output)[0])
+    output['pytorch_output'] = pytorch_output_list
     output['onnx_output'] = onnx_output_list
     output['tf_output'] = tf_output_list
     return output
 
-        
+# a function to localize buggy layers
+# the input is the output dictionary returned by the extract_inter_output function
+def localize_buggy_layer(output, thres = 1e-4):
+    py = output['pytorch_output']
+    onnx = output['onnx_output']
+    tf = output['tf_output']
+
+    num = len(py)
+    # inconsistent index between py&onnx and py&tf
+    py_onnx = -1;
+    py_tf = -1
+    for i in range(num):
+        if(not diff_test(py[i],onnx[i], thres = thres)):
+            if py_onnx==-1:
+                py_onnx = i
+        if(not diff_test(py[i],tf[i], thres = thres)):
+            if py_tf == -1:
+                py_tf = i
+    return [py_onnx,py_tf]
+    
