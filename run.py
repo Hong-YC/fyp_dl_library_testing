@@ -8,6 +8,8 @@ from utils.selection import Roulette
 from src.cases_generation.model_info_generator import ModelInfoGenerator
 from src.cases_generation.model_generator import ModelGenerator
 from src.cases_generation.data_generator import DataGenerator
+from src.incons_detection.inferencer import Inferencer
+from src.incons_detection.comparator import Comparator
 
 import os
 os.environ['MKL_THREADING_LAYER'] = 'GNU'
@@ -25,8 +27,8 @@ class TrainingDebugger(object):
         self.__model_info_generator = ModelInfoGenerator(config['model'], generate_mode, self.__db_manager, self.__selector)
         self.__model_generator = ModelGenerator(self.__db_manager, self.__selector, timeout)
         self.__training_data_generator = DataGenerator(config['training_data'])
-        # self.__weights_trainer = Trainer(self.__db_manager, timeout)
-        # self.__weights_comparator = Comparator(self.__db_manager)
+        self.__inferencer = Inferencer(self.__db_manager, timeout)
+        self.__comparator = Comparator(self.__db_manager)
 
     def run_generation(self):
         """
@@ -40,7 +42,7 @@ class TrainingDebugger(object):
                                                       model_id=model_id)
         
 
-        print(f'Model generation complete: model_id={model_id} ok_backends={ok_backends}')
+        print(f'Model generation complete: model_id={model_id} generation_ok_backends={ok_backends}')
 
         if len(ok_backends) >= 2:  
             print("Generate training data")
@@ -51,6 +53,32 @@ class TrainingDebugger(object):
         
 
         return model_id, exp_dir, ok_backends
+    
+    def run_detection(self, model_id: int, exp_dir: str, ok_backends: List[str]):
+        """
+        Run differential testing on a model
+        """
+        
+        if len(ok_backends) >= 2:
+            # Inference Stage
+            print('Start Inference...')
+            status, backends_outputs, ok_backends = self.__inferencer.inference(model_id=model_id,
+                                                                                                                                       exp_dir=exp_dir,
+                                                                                                                                       ok_backends=ok_backends)
+            print(f'Inference end: ok_backends={ok_backends}')
+
+            self.__db_manager.record_status(model_id, status)
+
+        if len(ok_backends) >= 2:
+            # Comparator stage
+            print('Compare start...')
+            self.__comparator.compare(model_id=model_id,
+                                    exp_dir=exp_dir,
+                                    backends_outputs=backends_outputs,
+                                    ok_backends=ok_backends)
+            print('Compare end.')
+
+        return ok_backends
 
 
 def main(testing_config):
@@ -66,7 +94,7 @@ def main(testing_config):
             'node_num_range': (5, 5),
         },
         'training_data': {
-            'instance_num': 10,
+            'instance_num': 1,
             'element_val_range': (0, 100),
         },
         'db_path': str(Path.cwd() / testing_config['data_dir'] / f'{testing_config["dataset_name"]}.db'),
@@ -83,15 +111,14 @@ def main(testing_config):
     debugger = TrainingDebugger(config, USE_HEURISTIC, GENERATE_MODE, TIMEOUT)
     start_time = datetime.datetime.now()
 
-    # model_id, exp_dir, ok_backends = debugger.run_generation()
 
     for i in range(CASE_NUM):
             print(f"######## Round {i} ########")
             try:
                 print("------------- generation -------------")
                 model_id, exp_dir, ok_backends = debugger.run_generation()
-                # print("------------- detection -------------")
-                # ok_backends = debugger.run_detection(model_id, exp_dir, ok_backends)
+                print("------------- detection -------------")
+                ok_backends = debugger.run_detection(model_id, exp_dir, ok_backends)
             except Exception:
                 import traceback
                 traceback.print_exc()
