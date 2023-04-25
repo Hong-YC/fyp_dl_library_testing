@@ -20,125 +20,79 @@ import tensorflow as tf
 import logging, os
 # from tensorflow.python.ops import *
 
+
+def __norm_delta(x, y, mode="max"):
+    if x is None or y is None:
+            return None
+    # infinite norm
+    if mode=="max":
+        return float(np.max(np.abs(x-y)))
+    # l2 norm
+    elif mode=="l2":
+        return float(np.sum((x-y)*(x-y)))
+    else:
+        return None
+
 if __name__ == '__main__':
 
-    model_info_path = './data/dummy_output/000007/models/model.json'
-    training_inputs_path = './data/dummy_output/000007/dataset/inputs.npz'
-    ground_truths_path = './data/dummy_output/000007/dataset/ground_truths.npz'
+    model_info_path = '/data/fyp23-dlltest/Hong/fyp_dl_library_testing/data/dummy_output/000118/models/model.json'
+    training_inputs_path = '/data/fyp23-dlltest/Hong/fyp_dl_library_testing/data/dummy_output/000118/dataset/inputs.npz'
+
     
     # Load the model info
     with open(model_info_path, 'r') as f:
         m_info = json.load(f)
 
     
-    device = "cpu"
+    device = 'cpu'
     if torch.cuda.is_available():
         device = "cuda:0"
+
     # Generate the model using model_info
-    # model = TorchModel(m_info)
-    # print(model)
-
-    # Load input data
-    training_inputs = [*np.load(training_inputs_path).values()]
-    input = torch.from_numpy(training_inputs[0]).to(torch.float32)
-    print("Input shape: ", input.shape)
-    # model = model.to(device)
-    input = input.to(device)
+    model = TorchModel(m_info)
+    model.load_state_dict(torch.load('/data/fyp23-dlltest/Hong/fyp_dl_library_testing/data/dummy_output/000118/models/torch.pt'))
     
-    
-    dic = m_info["model_structure"]
-    model_info = m_info.copy()
-    # for key in dic:
-    #     print(dic[key])
-    key = '3'
-    first_two = dict(list(dic.items())[:int(key)+1])
-    print(first_two)
-    # m_info['model_structure'] = 
-    device = "cpu"
-    if torch.cuda.is_available():
-        device = "cuda:0"
-    model_info['model_structure'] = first_two
-    model_info['output_id_list'] = list(key)
-
-    model = TorchModel(model_info)
     model = model.to(device)
-    print(model)
-    output_id = key
-
-    # Perform inference
-    output_id = model_info['output_id_list'][0]
-    output = model(input)[output_id]
-    print("Output shape: ", output.shape)
 
 
-
+    # # Load input data
+    training_inputs = [*np.load(training_inputs_path).values()]
+    training_input = torch.from_numpy(training_inputs[0]).to(torch.float32)
     
+    # print("Input shape: ", training_inputs[0].shape)
+    torch_training_input = training_input.to(device)
+
+    O_torch=list(model(torch_training_input).values())[0].detach().cpu().numpy()
+    print(O_torch.flatten()[-5:])
+
+    input_shape = m_info['model_structure']['0']['args']['shape']
+    input_shape.insert(0, 1)
+
+    dummy_input = torch.ones(input_shape).to(device)
 
 
-
-    #===========================================================
-    # Test the generated model using torch summary
-    # input_shape = m_info["model_structure"]["0"]["args"]["shape"]
-    # print(input_shape)
-
-    # model.to(device)
-    # summary(model, input_size=tuple(input_shape))
-
-    # ======================================================================
-
-
-    # Test Converting Pytorch to ONNX
-    input_shape = input.shape
-    # input_shape = (1,) + input_shape
-    dummy_input = torch.ones(*input_shape).to(device)
-    # print(dummy_input)
-    # model_onnx_path = "./src/onnx_model/model.onnx"
-    model_onnx_path = "model.onnx"
 
     torch.onnx.export(
-        model, dummy_input, model_onnx_path,
+        model, dummy_input, "test_model.onnx",
         export_params=True,
-        opset_version=11,  # version can be >=7 <=16
-        # We define axes as dynamic to allow batch_size > 1
+        output_names=["out"],
+        opset_version=12
     )
 
-    onnx_model = onnx.load("model.onnx")
-    # load onnx into tf_rep model
-    tf_rep = prepare(onnx_model)
-    # tf_rep.export_graph("output/model.pb")
-    tf_input = tf.convert_to_tensor(training_inputs[0], dtype = tf.float32)
-    tf_output = tf_rep.run(tf_input)
-    print(tf_output)
-    # print(diff_test(output, tf_output, thres = 10e-1))
-    
-    #===========================================================================
-    # model = onnx.load(model_onnx_path)
-    # onnx.checker.check_model(model)
-    # print(onnx.helper.printable_graph(model.graph))
-    # input_sample = torch.ones(*input_shape).to(device)
-    # print(input_sample.shape)
-    # ort_session = onnxruntime.InferenceSession(model_onnx_path)
-    # ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input_sample)}
-    # ort_outputs = ort_session.run(None, ort_inputs)
-    
-    # config = {
-    #     'var': {
-    #         'tensor_dimension_range': (5,5),
-    #         'tensor_element_size_range': (2, 64),
-    #         'weight_value_range' : (5,6),
-    #         'small_value_range' : (1,3)
-    #     },
-    #     'node_num_range': (5, 5),
-    # }
+    sess = onnxruntime.InferenceSession("test_model.onnx")
+    input_name = sess.get_inputs()[0].name
+    label_name = sess.get_outputs()[0].name
 
-    # db_manager = DbManager(str(Path.cwd() / 'data' / 'dummy.db'))
+    #prepare input
+    training_input = np.float32(training_inputs[0])
 
-    # m_info_generator = ModelInfoGenerator(config, 'seq', db_manager)
+    # Run inference
+    result = sess.run(None, {input_name: training_input})
+    O_onnx=result[0]
+    print(O_onnx.flatten()[-5:])
 
-    # m_info = m_info_generator.generate_seq_model(5, output_shape=(None, 3, 4), element = "FractionalMaxPool3d")
+    # O_torch=list(model(torch_training_input).values())[0].detach().cpu().numpy()
+    # print(O_torch.flatten()[-5:])
 
-    # with open(str(Path.cwd() / 'models/dummy_model.json'), 'w') as f:
-    #     json.dump(m_info[0], f)
+    print(__norm_delta(O_onnx, O_torch, mode='max'))
 
-    #==============================================================================
-    

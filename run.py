@@ -63,8 +63,8 @@ class TrainingDebugger(object):
             # Inference Stage
             print('Start Inference...')
             status, backends_outputs, ok_backends = self.__inferencer.inference(model_id=model_id,
-                                                                                                                                       exp_dir=exp_dir,
-                                                                                                                                       ok_backends=ok_backends)
+                                                                                exp_dir=exp_dir,
+                                                                                ok_backends=ok_backends)
             print(f'Inference end: ok_backends={ok_backends}')
 
             self.__db_manager.record_status(model_id, status)
