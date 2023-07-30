@@ -18,7 +18,7 @@ numpy 1.23.4
 ## Experiment
 
 
-1. Configuration
+#### 1. Configuration
 
 A configuration file `testing_config.json` should be provided to flexibly set up testing configuration. Here is an example:
 
@@ -35,14 +35,14 @@ A configuration file `testing_config.json` should be provided to flexibly set up
 * `timeout` indicates the timeout duration for each model.
 * `use_heuristic` indicates if using the heuristic method mentioned in the paper or not. `1` is recommended.
 
-2. Generate database
+#### 2. Generate database
 Execute the following command in `/data/data` to create the ***sqlite*** database for storing the testing results:
 
   ```
   sqlite3 dummy.db < create_db.sql
   ```
 
-3. Start
+#### 3. Start
 Use the following command to run the experiment according to the configuration:
 
 ```shell
