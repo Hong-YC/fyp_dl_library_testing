@@ -4,7 +4,7 @@ This is the implementation repository of our Final Year Project: **An Automated 
 
 ## Description
 Artificial intelligence (AI) has ushered in a new era of technological advancements, but its reliance on deep learning libraries can introduce bugs that are difficult to detect and debug manually.This problem becomes more pronounced when the bugs are not immediately apparent, leading to costly and time-consuming efforts to identify and fix them. To address this challenge, we
-developed an automated testing tool for deep learning libraries that uses model-based techniques to detect bugs efficiently. Our experiments demonstrate that our tool successfully identified bugs in the libraries, validating its effectiveness and usefulness in ensuring the reliability of DL libraries. For more detailed information, one can refer to our [report]().
+developed an automated testing tool for deep learning libraries that uses model-based techniques to detect bugs efficiently. Our experiments demonstrate that our tool successfully identified bugs in the libraries, validating its effectiveness and usefulness in ensuring the reliability of DL libraries. For more detailed information, one can refer to our [report](https://github.com/Hong-YC/fyp_dl_library_testing/blob/master/Report.pdf).
 
 ## Environment
 To replicate the results shown in the report, install the following packages:
