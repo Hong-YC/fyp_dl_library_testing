@@ -97,17 +97,16 @@ def main(testing_config):
             'instance_num': 1,
             'element_val_range': (0, 100),
         },
-        'db_path': str(Path.cwd() / testing_config['data_dir'] / f'{testing_config["dataset_name"]}.db'),
-        'output_dir': str(Path.cwd() / testing_config['data_dir'] / f'{testing_config["dataset_name"]}_output'),
-        'report_dir': str(Path.cwd() / testing_config['data_dir'] / f'{testing_config["dataset_name"]}_report'),
+        'db_path': str(Path.cwd() / testing_config['data_dir'] / 'dummy.db'),
+        'output_dir': str(Path.cwd() / testing_config['data_dir'] / 'dummy_output'),
+        'report_dir': str(Path.cwd() / testing_config['data_dir'] / 'dummy_report'),
         'distance_threshold': 0,
     }
 
     CASE_NUM = testing_config["case_num"]
     TIMEOUT = testing_config["timeout"]  # Second
     USE_HEURISTIC = bool(testing_config["use_heuristic"])  
-    GENERATE_MODE = testing_config["generate_mode"]  # seq\merging\dag\template
-
+    GENERATE_MODE = "seq"  
     debugger = TrainingDebugger(config, USE_HEURISTIC, GENERATE_MODE, TIMEOUT)
     start_time = datetime.datetime.now()
 
