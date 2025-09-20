@@ -1,6 +1,6 @@
 # An Automated Testing Tool for Deep Learning Libraries
 
-This is the implementation repository of our Final Year Project: **An Automated Testing Tool for Deep Learning Libraries** supervised by [Professor Shing-Chi Cheung](https://www.cse.ust.hk/~scc/) in HKUST. Our implementation is based on the implementation of [Muffin](https://github.com/library-testing/Muffin).
+This is the implementation repository of our Final Year Project: **An Automated Testing Tool for Deep Learning Libraries** supervised by [Professor Shing-Chi Cheung](https://www.cse.ust.hk/~scc/) in HKUST. Our implementation extended [Muffin](https://github.com/library-testing/Muffin) to support PyTorch and ONNX.
 
 ## Description
 Artificial intelligence (AI) has ushered in a new era of technological advancements, but its reliance on deep learning libraries can introduce bugs that are difficult to detect and debug manually.This problem becomes more pronounced when the bugs are not immediately apparent, leading to costly and time-consuming efforts to identify and fix them. To address this challenge, we
